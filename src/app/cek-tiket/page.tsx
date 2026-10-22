@@ -261,9 +261,11 @@ function CekTiketContent() {
                       {result.anggota.kategori_anggota === "siswa" ||
                       result.anggota.tingkatan?.startsWith("Siswa") ||
                       result.anggota.tingkatan === "Calon Warga"
-                        ? String(result.anggota.tahun_pengesahan)
-                        : `Angkatan ${result.anggota.angkatan || result.anggota.tahun_pengesahan}${
-                            result.anggota.tanggal_pengesahan ? ` • ${result.anggota.tanggal_pengesahan}` : ""
+                        ? `Target Th. ${result.anggota.tahun_pengesahan}`
+                        : `${result.anggota.angkatan ? `Angkatan ${result.anggota.angkatan}` : ""}${
+                            result.anggota.tanggal_pengesahan
+                              ? ` • Disahkan: ${result.anggota.tanggal_pengesahan}`
+                              : ` • Th. ${result.anggota.tahun_pengesahan}`
                           }`}
                     </span>
                   </div>

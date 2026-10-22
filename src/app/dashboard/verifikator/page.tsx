@@ -158,7 +158,10 @@ export default function VerifikatorDashboardPage() {
 
                   <div className="mt-3 flex items-center justify-between text-[11px] text-stone-500">
                     <span>{item.desa?.nama_desa}</span>
-                    <span>Angkatan {item.tahun_pengesahan}</span>
+                    <span className="font-semibold text-amber-950">
+                      {item.angkatan ? `Angkatan ${item.angkatan}` : ""}
+                      {item.tahun_pengesahan ? ` • Th. ${item.tahun_pengesahan}` : ""}
+                    </span>
                   </div>
                 </div>
               );
@@ -214,8 +217,13 @@ export default function VerifikatorDashboardPage() {
                   <span className="font-mono text-stone-800">{selectedItem.nomor_wa}</span>
                 </div>
                 <div>
-                  <span className="text-stone-400 block">Pengesahan / Tempat:</span>
-                  <span>Tahun {selectedItem.tahun_pengesahan} • {selectedItem.tempat_pengesahan}</span>
+                  <span className="text-stone-400 block">Angkatan & Pengesahan:</span>
+                  <span className="font-semibold text-stone-800">
+                    {selectedItem.angkatan ? `Angkatan ${selectedItem.angkatan}` : ""}
+                    {selectedItem.tanggal_pengesahan
+                      ? ` • ${selectedItem.tanggal_pengesahan}`
+                      : ` • Th. ${selectedItem.tahun_pengesahan}`}
+                  </span>
                 </div>
                 <div>
                   <span className="text-stone-400 block">Alamat Domisili:</span>

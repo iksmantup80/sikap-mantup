@@ -417,8 +417,21 @@ export default function AdminDashboardPage() {
                         </td>
                         <td className="py-3 px-4">
                           <TingkatanBadge tingkatan={a.tingkatan} />
-                          <div className="text-[10px] text-stone-500 mt-0.5">
-                            {isSiswa ? `Target ${a.tahun_pengesahan}` : `Angkatan ${a.tahun_pengesahan}`}
+                          <div className="text-[11px] mt-1">
+                            {isSiswa ? (
+                              <span className="text-indigo-800 font-medium">Target {a.tahun_pengesahan}</span>
+                            ) : (
+                              <div>
+                                {a.angkatan && (
+                                  <span className="font-bold text-amber-950 block">
+                                    Angkatan {a.angkatan}
+                                  </span>
+                                )}
+                                <span className="text-[10px] text-stone-500 block">
+                                  {a.tanggal_pengesahan ? `Disahkan: ${a.tanggal_pengesahan}` : `Disahkan Th. ${a.tahun_pengesahan}`}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="py-3 px-4">
@@ -509,7 +522,10 @@ export default function AdminDashboardPage() {
 
                       <div className="mt-2.5 flex items-center justify-between text-[11px] text-stone-500">
                         <span className="font-medium text-stone-700">{item.desa?.nama_desa}</span>
-                        <span>Angkatan {item.tahun_pengesahan}</span>
+                        <span className="font-semibold text-amber-950">
+                          {item.angkatan ? `Angkatan ${item.angkatan}` : ""}
+                          {item.tahun_pengesahan ? ` • Th. ${item.tahun_pengesahan}` : ""}
+                        </span>
                       </div>
 
                       {isSelected && (
@@ -560,8 +576,12 @@ export default function AdminDashboardPage() {
                     <div>
                       <span className="text-stone-400 block">Angkatan & Pengesahan:</span>
                       <span className="font-semibold text-stone-800">
-                        {selectedVerifItem.angkatan ? `Angkatan ${selectedVerifItem.angkatan}` : `Tahun ${selectedVerifItem.tahun_pengesahan}`}
-                        {selectedVerifItem.tanggal_pengesahan ? ` • ${selectedVerifItem.tanggal_pengesahan}` : ""}
+                        {selectedVerifItem.angkatan ? `Angkatan ${selectedVerifItem.angkatan}` : ""}
+                        {selectedVerifItem.tanggal_pengesahan
+                          ? ` • Disahkan: ${selectedVerifItem.tanggal_pengesahan}`
+                          : selectedVerifItem.tahun_pengesahan
+                          ? ` • Th. ${selectedVerifItem.tahun_pengesahan}`
+                          : ""}
                       </span>
                     </div>
                     <div>
@@ -841,8 +861,12 @@ export default function AdminDashboardPage() {
                 <div>
                   <span className="text-stone-400 block">Angkatan & Pengesahan:</span>
                   <span className="font-semibold text-stone-900">
-                    {selectedAnggota.angkatan ? `Angkatan ${selectedAnggota.angkatan}` : `Tahun ${selectedAnggota.tahun_pengesahan}`}
-                    {selectedAnggota.tanggal_pengesahan ? ` • ${selectedAnggota.tanggal_pengesahan}` : ""}
+                    {selectedAnggota.angkatan ? `Angkatan ${selectedAnggota.angkatan}` : ""}
+                    {selectedAnggota.tanggal_pengesahan
+                      ? ` • Disahkan: ${selectedAnggota.tanggal_pengesahan}`
+                      : selectedAnggota.tahun_pengesahan
+                      ? ` • Th. ${selectedAnggota.tahun_pengesahan}`
+                      : ""}
                   </span>
                 </div>
                 <div>

@@ -121,7 +121,9 @@ export function KtaCard({
             <span className="text-[11px] font-semibold text-amber-200">
               {isSiswa
                 ? `Mulai/Target: ${anggota.tahun_pengesahan}`
-                : `Angkatan ${anggota.angkatan || anggota.tahun_pengesahan}`}
+                : anggota.angkatan
+                ? `Angkatan ${anggota.angkatan}`
+                : `Pengesahan ${anggota.tahun_pengesahan}`}
             </span>
           </div>
 

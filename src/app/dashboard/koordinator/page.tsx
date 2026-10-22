@@ -153,7 +153,7 @@ export default function KoordinatorDashboardPage() {
                   <td className="py-3 px-4">
                     <TingkatanBadge tingkatan={a.tingkatan} />
                     <div className="text-[10px] text-stone-500 mt-0.5">
-                      Tahun {a.tahun_pengesahan}
+                      {a.angkatan ? `Angkatan ${a.angkatan} • ` : ""}Disahkan {a.tahun_pengesahan}
                     </div>
                   </td>
                   <td className="py-3 px-4 text-stone-600">
