@@ -19,8 +19,8 @@ function CekTiketContent() {
     anggota?: Anggota;
   } | null>(null);
   const [searched, setSearched] = useState(false);
-
   const [loading, setLoading] = useState(false);
+  const [myRecentTikets, setMyRecentTikets] = useState<string[]>([]);
 
   const handleSearch = async (codeToSearch?: string) => {
     const code = (codeToSearch || inputTiket).trim();
@@ -36,8 +36,27 @@ function CekTiketContent() {
   };
 
   useEffect(() => {
+    // Muat riwayat tiket dari browser localStorage jika ada
+    if (typeof window !== "undefined") {
+      try {
+        const stored = JSON.parse(localStorage.getItem("sikap_my_tikets") || "[]");
+        if (Array.isArray(stored) && stored.length > 0) {
+          setMyRecentTikets(stored);
+        }
+      } catch (e) {
+        console.warn("Gagal membaca riwayat tiket lokal:", e);
+      }
+    }
+
     if (initialTiket) {
       handleSearch(initialTiket);
+    } else if (typeof window !== "undefined") {
+      // Jika URL tidak memiliki parameter tiket, cek tiket terakhir yang disimpan
+      const last = localStorage.getItem("sikap_last_tiket");
+      if (last) {
+        setInputTiket(last);
+        handleSearch(last);
+      }
     }
   }, [initialTiket]);
 
@@ -51,7 +70,7 @@ function CekTiketContent() {
           Cek Status Pengajuan & Tiket
         </h1>
         <p className="text-xs sm:text-sm text-stone-600 mt-2">
-          Masukkan kode tiket pengajuan (misal: <code>MTP-202602-001</code>) untuk mengetahui tahapan verifikasi atau catatan perbaikan.
+          Masukkan nomor tiket pengajuan (contoh: <code>MTP-202610-123</code>) untuk mengetahui tahapan pemeriksaan KTA atau catatan verifikator ranting.
         </p>
       </div>
 
@@ -68,22 +87,60 @@ function CekTiketContent() {
             type="text"
             value={inputTiket}
             onChange={(e) => setInputTiket(e.target.value)}
-            placeholder="Ketik Nomor Tiket Anda (contoh: MTP-202602-001)"
+            placeholder="Ketik Nomor Tiket Anda (contoh: MTP-202610-123)"
             className="flex-1 px-4 py-3 rounded-xl border border-stone-300 font-mono text-stone-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 uppercase"
           />
           <button
             type="submit"
-            className="px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-xl text-sm shadow-md transition"
+            disabled={loading}
+            className="px-6 py-3 bg-amber-700 hover:bg-amber-800 disabled:bg-stone-400 text-white font-semibold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2"
           >
-            Lacak Status
+            {loading ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                <span>Melacak...</span>
+              </>
+            ) : (
+              <span>Lacak Status</span>
+            )}
           </button>
         </form>
 
-        <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
+        {/* Quick select from recent tickets in this browser */}
+        {myRecentTikets.length > 0 && (
+          <div className="mt-4 pt-3 border-t border-stone-100 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-stone-400">Tiket Anda Sebelumnya:</span>
+            {myRecentTikets.slice(0, 3).map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => {
+                  setInputTiket(code);
+                  handleSearch(code);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-amber-100 text-amber-900 font-mono font-bold text-[11px] transition border border-stone-200"
+              >
+                {code}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-3 flex items-center justify-between text-xs text-stone-500">
           <span>Kode tiket berformat: <strong className="font-mono text-stone-700">MTP-YYYYMM-XXX</strong></span>
-          <span className="text-stone-400">Diterbitkan otomatis saat mengirim formulir</span>
+          <span className="text-stone-400">Tersinkronisasi otomatis dengan Database Cloud</span>
         </div>
       </div>
+
+      {/* Loading state indicator */}
+      {loading && !searched && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-8 text-center text-xs text-stone-500 animate-pulse">
+          Menghubungkan ke server database untuk memeriksa status tiket...
+        </div>
+      )}
 
       {/* Result Display */}
       {searched && (
@@ -95,7 +152,7 @@ function CekTiketContent() {
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 mb-4">
                   <div>
                     <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">
-                      Kode Tiket
+                      Kode Tiket Pelacakan
                     </span>
                     <span className="text-xl sm:text-2xl font-black font-mono text-amber-950">
                       {result.pengajuan.kode_tiket}
@@ -146,16 +203,16 @@ function CekTiketContent() {
                 </div>
 
                 {/* Revision Notes if Needed */}
-                {result.pengajuan.catatan_revisi && (
+                {(result.pengajuan.catatan_revisi || result.anggota.catatan_verifikasi) && (
                   <div className="p-4 rounded-xl bg-orange-50 border border-orange-200 text-orange-900 text-xs mb-6">
                     <div className="flex items-center gap-2 font-bold text-sm mb-1">
                       <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
-                      Catatan Koreksi dari Petugas Verifikator:
+                      Catatan Petugas Verifikator:
                     </div>
                     <p className="mt-1 leading-relaxed pl-7">
-                      {result.pengajuan.catatan_revisi}
+                      {result.pengajuan.catatan_revisi || result.anggota.catatan_verifikasi}
                     </p>
                   </div>
                 )}
@@ -261,7 +318,7 @@ function CekTiketContent() {
               </svg>
               <h3 className="text-lg font-bold text-stone-800">Tiket Tidak Ditemukan</h3>
               <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
-                Nomor tiket <code>{inputTiket}</code> tidak tercatat. Pastikan penulisan kode sudah sesuai dengan format <code>MTP-YYYYMM-XXX</code>.
+                Nomor tiket <code>{inputTiket}</code> belum tercatat dalam sistem. Pastikan penulisan kode sudah sesuai dengan format <code>MTP-YYYYMM-XXX</code>.
               </p>
             </div>
           )}

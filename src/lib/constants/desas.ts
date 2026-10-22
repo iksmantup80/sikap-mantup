@@ -2,7 +2,7 @@ import { WilayahDesa } from "@/types/database";
 
 export const DESA_MANTUP_LIST: WilayahDesa[] = [
   {
-    id: "d1010101-0001-4000-8000-000000000001",
+    id: "55fb0bba-634d-442a-953d-3aac778f408b",
     nama_desa: "Desa Mantup",
     kode_desa: "MTP-01",
     nama_koordinator: "Mas Bambang Hermanto",
@@ -14,7 +14,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0002-4000-8000-000000000002",
+    id: "87cae63e-47a2-4f9a-bdf7-66eb98f96729",
     nama_desa: "Desa Sukobendu",
     kode_desa: "MTP-02",
     nama_koordinator: "Mas Agus Prasetyo",
@@ -26,7 +26,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0003-4000-8000-000000000003",
+    id: "9581dceb-a6bf-46f8-a1fa-12ffdb6bedba",
     nama_desa: "Desa Kedungsumber",
     kode_desa: "MTP-03",
     nama_koordinator: "Mas Didik Wahyudi",
@@ -38,7 +38,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0004-4000-8000-000000000004",
+    id: "1f21a06d-267f-4818-9a32-ec9659fccbea",
     nama_desa: "Desa Sumberkerep",
     kode_desa: "MTP-04",
     nama_koordinator: "Mas Eko Santoso",
@@ -50,7 +50,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0005-4000-8000-000000000005",
+    id: "6450c7b4-6849-4af9-86cc-51039469accd",
     nama_desa: "Desa Mojosari",
     kode_desa: "MTP-05",
     nama_koordinator: "Mas Fajar Rudianto",
@@ -62,7 +62,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0006-4000-8000-000000000006",
+    id: "b8668ae0-825b-4e7e-a212-c50ab6cb2a77",
     nama_desa: "Desa Kedukbembem",
     kode_desa: "MTP-06",
     nama_koordinator: "Mas Gatot Subroto",
@@ -74,7 +74,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0007-4000-8000-000000000007",
+    id: "776b2dc0-c548-407d-970c-ec730ad874b5",
     nama_desa: "Desa Tunggunjagir",
     kode_desa: "MTP-07",
     nama_koordinator: "Mas Haryono",
@@ -86,7 +86,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0008-4000-8000-000000000008",
+    id: "dd55fd51-d22e-4053-a86b-0b413aedd2e2",
     nama_desa: "Desa Plabuhan",
     kode_desa: "MTP-08",
     nama_koordinator: "Mas Indra Setiawan",
@@ -98,7 +98,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0009-4000-8000-000000000009",
+    id: "45474df5-7c5a-41fd-8ee0-ebc29830e55d",
     nama_desa: "Desa Rumpuk",
     kode_desa: "MTP-09",
     nama_koordinator: "Mas Joko Susilo",
@@ -110,7 +110,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0010-4000-8000-000000000010",
+    id: "60fee241-0c82-447d-9a88-211a22f69972",
     nama_desa: "Desa Tugu",
     kode_desa: "MTP-10",
     nama_koordinator: "Mas Kuncoro Hadi",
@@ -122,7 +122,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0011-4000-8000-000000000011",
+    id: "03e2a17a-0c32-4a32-a005-3c5c6442a49c",
     nama_desa: "Desa Sukosongo",
     kode_desa: "MTP-11",
     nama_koordinator: "Mas Lukman Hakim",
@@ -134,7 +134,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0012-4000-8000-000000000012",
+    id: "aad7de89-ddd9-47ab-89f6-5a29850550ca",
     nama_desa: "Desa Sumberagung",
     kode_desa: "MTP-12",
     nama_koordinator: "Mas Mulyadi",
@@ -146,7 +146,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0013-4000-8000-000000000013",
+    id: "c7a5f7b3-41cd-4e0c-a0d2-118776ee0421",
     nama_desa: "Desa Sumberdadi",
     kode_desa: "MTP-13",
     nama_koordinator: "Mas Nanang Suherman",
@@ -158,7 +158,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0014-4000-8000-000000000014",
+    id: "b2a0c49f-2aa9-4920-9a49-bd5c8bcdd615",
     nama_desa: "Desa Sidomulyo",
     kode_desa: "MTP-14",
     nama_koordinator: "Mas Ongko Wijoyo",
@@ -170,7 +170,7 @@ export const DESA_MANTUP_LIST: WilayahDesa[] = [
     updated_at: "2026-01-01T00:00:00Z",
   },
   {
-    id: "d1010101-0015-4000-8000-000000000015",
+    id: "21e81da8-17a3-46aa-9fff-2910ea24405e",
     nama_desa: "Desa Kutorejo",
     kode_desa: "MTP-15",
     nama_koordinator: "Mas Priyo Utomo",

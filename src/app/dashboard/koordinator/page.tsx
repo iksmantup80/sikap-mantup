@@ -5,15 +5,31 @@ import { AnggotaService } from "@/lib/services/anggotaService";
 import { DESA_MANTUP_LIST } from "@/lib/constants/desas";
 import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
 import { FormPendataan } from "@/components/forms/FormPendataan";
+import { Anggota } from "@/types/database";
 
 export default function KoordinatorDashboardPage() {
   // Demo coordinator for Desa Sukobendu (MTP-02)
   const [activeDesaId, setActiveDesaId] = useState<string>(DESA_MANTUP_LIST[1].id);
   const [showInputForm, setShowInputForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [wargaDesa, setWargaDesa] = useState<Anggota[]>(() => AnggotaService.getAll({ desa_id: DESA_MANTUP_LIST[1].id }));
+  const [loading, setLoading] = useState(false);
 
   const activeDesa = DESA_MANTUP_LIST.find((d) => d.id === activeDesaId) || DESA_MANTUP_LIST[1];
-  const wargaDesa = AnggotaService.getAll({ desa_id: activeDesaId });
+
+  const reloadData = async () => {
+    setLoading(true);
+    try {
+      const data = await AnggotaService.getAllAsync({ desa_id: activeDesaId });
+      setWargaDesa(data.filter((a) => a.desa_id === activeDesaId));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    reloadData();
+  }, [activeDesaId, refreshTrigger]);
 
   return (
     <div className="space-y-6">
@@ -47,6 +63,22 @@ export default function KoordinatorDashboardPage() {
               ))}
             </select>
           </div>
+
+          <button
+            onClick={reloadData}
+            disabled={loading}
+            className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-semibold shadow-xs transition flex items-center gap-1.5 border border-stone-300"
+          >
+            <svg
+              className={`w-3.5 h-3.5 ${loading ? "animate-spin text-amber-700" : "text-stone-600"}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>{loading ? "Sinkron..." : "Sinkronkan"}</span>
+          </button>
 
           <button
             onClick={() => setShowInputForm(!showInputForm)}
