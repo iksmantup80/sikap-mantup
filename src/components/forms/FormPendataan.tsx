@@ -114,7 +114,7 @@ export function FormPendataan({
 
     try {
       // Simulate submission to AnggotaService
-      const res = AnggotaService.submitPengajuanMandiri(data);
+      const res = await AnggotaService.submitPengajuanMandiri(data);
       setSubmitResult(res);
       if (res.success && res.tiket) {
         if (onSuccess) onSuccess(res.tiket);

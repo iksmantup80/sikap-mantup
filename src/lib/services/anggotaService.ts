@@ -2,6 +2,7 @@ import { Anggota, DuplikatCandidate, PengajuanAnggota, StatusVerifikasi } from "
 import { DEMO_ANGGOTA, DEMO_PENGAJUAN } from "../mockData";
 import { DESA_MANTUP_LIST } from "../constants/desas";
 import { FormAnggotaInput } from "../validations/anggota";
+import { createClient } from "../supabase/client";
 
 // Penyimpanan State In-Memory untuk simulasi interaktif tanpa database eksternal
 let localAnggotaList: Anggota[] = [...DEMO_ANGGOTA];
@@ -86,10 +87,10 @@ export const AnggotaService = {
     return { isDuplicate: false };
   },
 
-  // Pengajuan Mandiri oleh Calon Anggota
-  submitPengajuanMandiri: (
+  // Pengajuan Mandiri oleh Calon Anggota (Dengan sinkronisasi Supabase Cloud)
+  submitPengajuanMandiri: async (
     input: FormAnggotaInput
-  ): { success: boolean; tiket?: string; message: string; anggotaId?: string } => {
+  ): Promise<{ success: boolean; tiket?: string; message: string; anggotaId?: string }> => {
     const dupCheck = AnggotaService.periksaDuplikasi(input);
     if (dupCheck.isDuplicate) {
       return {
@@ -99,10 +100,64 @@ export const AnggotaService = {
     }
 
     const desaObj = DESA_MANTUP_LIST.find((d) => d.id === input.desa_id);
-    const newId = `agt-${Date.now()}`;
+    let newId = `agt-${Date.now()}`;
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const randomSuffix = Math.floor(100 + Math.random() * 900);
     const tiketCode = `MTP-${dateStr}-${randomSuffix}`;
+
+    // Sinkronisasi otomatis ke Supabase PostgreSQL jika URL & Key tersedia
+    try {
+      const supabase = createClient();
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+      if (supabaseUrl && !supabaseUrl.includes("example.supabase.co")) {
+        // Cari UUID desa di database
+        const { data: desaDb } = await supabase
+          .from("wilayah_desa")
+          .select("id")
+          .eq("nama_desa", desaObj?.nama_desa)
+          .single();
+
+        const actualDesaId = desaDb?.id || input.desa_id;
+
+        const { data: dbAgt, error: agtError } = await supabase
+          .from("anggota")
+          .insert({
+            nomor_kta: input.nomor_kta ? input.nomor_kta.trim() : null,
+            nama_lengkap: input.nama_lengkap,
+            nik: input.nik || null,
+            tempat_lahir: input.tempat_lahir,
+            tanggal_lahir: input.tanggal_lahir,
+            jenis_kelamin: input.jenis_kelamin,
+            desa_id: actualDesaId,
+            alamat_detail: input.alamat_detail,
+            rt_rw: input.rt_rw || null,
+            nomor_wa: input.nomor_wa,
+            tingkatan: input.tingkatan,
+            tahun_pengesahan: input.tahun_pengesahan,
+            tempat_pengesahan: input.tempat_pengesahan,
+            status_keaktifan: input.status_keaktifan,
+            status_verifikasi: "menunggu_verifikasi",
+            foto_kta_url: input.foto_kta_url || null,
+            foto_profil_url: input.foto_profil_url || null,
+            is_demo: false,
+          })
+          .select("id")
+          .single();
+
+        if (!agtError && dbAgt) {
+          newId = dbAgt.id;
+          await supabase.from("pengajuan_anggota").insert({
+            kode_tiket: tiketCode,
+            anggota_id: dbAgt.id,
+            tipe_pengajuan: "pendataan_mandiri",
+            status: "menunggu_verifikasi",
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Sinkronisasi cloud Supabase tertunda, data disimpan lokal:", e);
+    }
 
     const newAnggota: Anggota = {
       id: newId,
