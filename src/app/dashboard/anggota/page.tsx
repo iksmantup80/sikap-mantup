@@ -1,20 +1,39 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import { KtaCard } from "@/components/cards/KtaCard";
 import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
 
 export default function AnggotaDashboardPage() {
-  // Demo active logged-in member: Mochamad Arifin (demo-001)
-  const anggota = AnggotaService.getById("demo-001");
+  const anggotaList = AnggotaService.getAll();
+  const anggota = anggotaList[0];
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [alamatUpdate, setAlamatUpdate] = useState(anggota?.alamat_detail || "");
   const [waUpdate, setWaUpdate] = useState(anggota?.nomor_wa || "");
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   if (!anggota) {
-    return <div className="p-8 text-center text-xs text-stone-500">Data profil anggota tidak ditemukan.</div>;
+    return (
+      <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center max-w-lg mx-auto shadow-xs">
+        <div className="w-14 h-14 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-xl">
+          👤
+        </div>
+        <h3 className="font-extrabold text-base text-stone-900 mb-1">
+          Belum Ada Data Warga Tertaut
+        </h3>
+        <p className="text-xs text-stone-500 mb-6 leading-relaxed">
+          Database Ranting Mantup baru saja dimulai dari nol. Silakan lakukan pendataan mandiri terlebih dahulu untuk mendaftarkan data keanggotaan Anda.
+        </p>
+        <Link
+          href="/pendataan"
+          className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold shadow-xs transition"
+        >
+          Formulir Pendataan Warga →
+        </Link>
+      </div>
+    );
   }
 
   const handleProposeUpdate = (e: React.FormEvent) => {

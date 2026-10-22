@@ -4,9 +4,9 @@ import { DESA_MANTUP_LIST } from "../constants/desas";
 import { FormAnggotaInput } from "../validations/anggota";
 import { createClient } from "../supabase/client";
 
-// Penyimpanan State In-Memory untuk simulasi interaktif tanpa database eksternal
-let localAnggotaList: Anggota[] = [...DEMO_ANGGOTA];
-let localPengajuanList: PengajuanAnggota[] = [...DEMO_PENGAJUAN];
+// Database Awal Bersih dari Nol (Tanpa data palsu sesuai Master Prompt)
+let localAnggotaList: Anggota[] = [];
+let localPengajuanList: PengajuanAnggota[] = [];
 
 export const AnggotaService = {
   // Mendapatkan semua anggota dengan filter terstruktur

@@ -78,17 +78,53 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Interactive Card Preview */}
+            {/* Right Column: Workflow Steps Card */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full max-w-sm">
-                <div className="text-center mb-2">
-                  <span className="text-xs uppercase tracking-wider text-amber-400/80 font-mono font-bold">
-                    Format Arsip Digital Warga
-                  </span>
+              <div className="w-full max-w-sm bg-stone-900/90 border border-amber-500/40 rounded-2xl p-6 text-white shadow-2xl backdrop-blur-xs">
+                <div className="flex items-center gap-3 border-b border-stone-800 pb-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-amber-600 flex items-center justify-center font-black text-white text-lg shadow-inner">
+                    IK
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-amber-100">Tahapan Pendataan Warga</h3>
+                    <p className="text-[11px] text-stone-400">Ranting Mantup, Kab. Lamongan</p>
+                  </div>
                 </div>
-                {demoAnggotaList[0] && (
-                  <KtaCard anggota={demoAnggotaList[0]} />
-                )}
+
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex items-start gap-3 bg-stone-800/60 p-2.5 rounded-xl border border-stone-700/60">
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-stone-950 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                    <div>
+                      <strong className="text-stone-200 block text-xs">Siapkan Identitas & KTA Fisik</strong>
+                      <span className="text-[11px] text-stone-400">Nomor KTA resmi Pusat Madiun dan data KTP.</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-stone-800/60 p-2.5 rounded-xl border border-stone-700/60">
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-stone-950 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <div>
+                      <strong className="text-stone-200 block text-xs">Pilih Desa Subranting</strong>
+                      <span className="text-[11px] text-stone-400">Pilih salah satu dari 15 desa wilayah Kec. Mantup.</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-stone-800/60 p-2.5 rounded-xl border border-stone-700/60">
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-stone-950 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <div>
+                      <strong className="text-stone-200 block text-xs">Dapatkan Nomor Tiket</strong>
+                      <span className="text-[11px] text-stone-400">Simpan tiket untuk memantau status verifikasi.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 pt-3 border-t border-stone-800">
+                  <Link
+                    href="/pendataan"
+                    className="w-full block text-center py-2.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-md transition"
+                  >
+                    Mulai Isi Formulir Sekarang →
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
