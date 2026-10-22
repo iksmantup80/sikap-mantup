@@ -134,6 +134,9 @@ export default function VerifikatorDashboardPage() {
                   onClick={() => {
                     setSelectedItem(item);
                     setCatatan(item.catatan_verifikasi || "");
+                    setTimeout(() => {
+                      document.getElementById("verif-inspection-box")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 50);
                   }}
                   className={`p-4 rounded-xl border transition cursor-pointer ${
                     isSelected
@@ -170,7 +173,7 @@ export default function VerifikatorDashboardPage() {
         </div>
 
         {/* Right Column: Detail & Decision Workspace */}
-        <div className="lg:col-span-7">
+        <div id="verif-inspection-box" className="lg:col-span-7 scroll-mt-24">
           {selectedItem ? (
             <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-md space-y-6">
               <div className="flex items-center justify-between border-b pb-4">

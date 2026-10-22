@@ -485,6 +485,9 @@ export default function AdminDashboardPage() {
                       onClick={() => {
                         setSelectedVerifItem(item);
                         setCatatanVerif(item.catatan_verifikasi || "");
+                        setTimeout(() => {
+                          document.getElementById("inspection-box")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }, 50);
                       }}
                       className={`p-3.5 rounded-xl border transition cursor-pointer ${
                         isSelected
@@ -508,6 +511,12 @@ export default function AdminDashboardPage() {
                         <span className="font-medium text-stone-700">{item.desa?.nama_desa}</span>
                         <span>Angkatan {item.tahun_pengesahan}</span>
                       </div>
+
+                      {isSelected && (
+                        <div className="mt-2 pt-1.5 border-t border-amber-200 text-[10px] text-amber-800 font-bold block lg:hidden">
+                          👉 Berkas aktif dibuka di bawah ↓
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -522,7 +531,7 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Right: Inspection & Decision Box */}
-            <div className="lg:col-span-7">
+            <div id="inspection-box" className="lg:col-span-7 scroll-mt-24">
               {selectedVerifItem ? (
                 <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-md space-y-5">
                   <div className="flex items-center justify-between border-b pb-4">
