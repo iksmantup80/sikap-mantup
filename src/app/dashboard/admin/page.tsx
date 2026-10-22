@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import { DESA_MANTUP_LIST } from "@/lib/constants/desas";
-import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge, DemoBadge } from "@/components/ui/Badge";
+import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
 import { Anggota, DuplikatCandidate } from "@/types/database";
 
 export default function AdminDashboardPage() {
@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
         <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-xs">
           <span className="text-xs text-stone-500 uppercase font-semibold">Total Warga</span>
           <div className="text-2xl font-black text-stone-900 mt-1">{stats.total}</div>
-          <span className="text-[10px] text-stone-400">Termasuk data DEMO</span>
+          <span className="text-[10px] text-stone-400">Tercatat di Database</span>
         </div>
         <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-xs">
           <span className="text-xs text-emerald-600 uppercase font-semibold">Terverifikasi</span>
@@ -231,7 +231,6 @@ export default function AdminDashboardPage() {
                       <td className="py-3 px-4">
                         <div className="font-bold text-stone-900 flex items-center gap-1.5">
                           <span>{a.nama_lengkap}</span>
-                          {a.is_demo && <DemoBadge />}
                         </div>
                         <div className="text-[10px] text-stone-400 font-mono">
                           NIK: {a.nik || "-"} • WA: {a.nomor_wa}

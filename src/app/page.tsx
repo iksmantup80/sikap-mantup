@@ -83,7 +83,7 @@ export default function HomePage() {
               <div className="relative w-full max-w-sm">
                 <div className="text-center mb-2">
                   <span className="text-xs uppercase tracking-wider text-amber-400/80 font-mono font-bold">
-                    Contoh Pratinjau Arsip Digital
+                    Format Arsip Digital Warga
                   </span>
                 </div>
                 {demoAnggotaList[0] && (
@@ -106,7 +106,7 @@ export default function HomePage() {
               <span className="text-3xl font-black text-amber-900 mt-1 block">
                 {stats.total}
               </span>
-              <span className="text-[11px] text-stone-500 mt-1 block">Data DEMO Terarsip</span>
+              <span className="text-[11px] text-stone-500 mt-1 block">Warga Terdaftar</span>
             </div>
 
             <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100">

@@ -90,24 +90,6 @@ export function FormPendataan({
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
-  // Quick fill demo sample data for testing
-  const fillSampleData = () => {
-    setValue("nama_lengkap", "Raden Mas Suryo Demo");
-    setValue("nik", "3524101201990001");
-    setValue("nomor_kta", "2016.08.3190");
-    setValue("tempat_lahir", "Lamongan");
-    setValue("tanggal_lahir", "1997-06-18");
-    setValue("jenis_kelamin", "L");
-    setValue("desa_id", defaultDesaId || DESA_MANTUP_LIST[0].id);
-    setValue("alamat_detail", "Jl. Raya Mantup Gang Mawar No. 04");
-    setValue("rt_rw", "03/01");
-    setValue("nomor_wa", "081234567811");
-    setValue("tingkatan", "Warga Tingkat 1");
-    setValue("tahun_pengesahan", 2016);
-    setValue("tempat_pengesahan", "Padepokan Pusat Madiun");
-    setValue("status_keaktifan", "aktif");
-  };
-
   const onSubmit = async (data: FormAnggotaInput) => {
     setIsSubmitting(true);
     setSubmitResult(null);
@@ -211,15 +193,11 @@ export function FormPendataan({
       <div className="bg-gradient-to-r from-stone-900 via-stone-800 to-amber-950 text-white p-6">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <span className="text-xs font-bold tracking-wider uppercase text-amber-400">
-            Formulir Pendataan Anggota
+            Formulir Pendataan Warga
           </span>
-          <button
-            type="button"
-            onClick={fillSampleData}
-            className="text-xs text-amber-200 hover:text-white underline underline-offset-2 flex items-center gap-1"
-          >
-            ⚡ Isi Contoh Data Percobaan (Demo)
-          </button>
+          <span className="text-xs text-amber-200/80 font-medium">
+            Kecamatan Mantup • Kab. Lamongan
+          </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-black text-amber-100">
           Pendataan Warga IKSPI Ranting Mantup

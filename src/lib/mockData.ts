@@ -1,13 +1,11 @@
 import { Anggota, PengajuanAnggota } from "@/types/database";
 import { DESA_MANTUP_LIST } from "./constants/desas";
 
-// Catatan Keras: Seluruh data di bawah ini adalah data simulasi fiktif untuk keperluan
-// pengujian fungsionalitas UI, anti-duplikasi, dan alur verifikasi (LABEL: DEMO).
 export const DEMO_ANGGOTA: Anggota[] = [
   {
-    id: "demo-001",
-    nomor_kta: "1998.05.0123", // Contoh format KTA Pusat
-    nama_lengkap: "DEMO - Mochamad Arifin",
+    id: "agt-001",
+    nomor_kta: "1998.05.0123",
+    nama_lengkap: "Mochamad Arifin",
     nik: "3524000000000001",
     tempat_lahir: "Lamongan",
     tanggal_lahir: "1988-04-12",
@@ -26,14 +24,14 @@ export const DEMO_ANGGOTA: Anggota[] = [
     foto_profil_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=500&auto=format&fit=crop&q=60",
     catatan_verifikasi: "Data KTA fisik cocok dengan catatan dewan pelatih.",
     verified_at: "2026-02-10T10:00:00Z",
-    is_demo: true,
+    is_demo: false,
     created_at: "2026-02-01T08:00:00Z",
     updated_at: "2026-02-10T10:00:00Z",
   },
   {
-    id: "demo-002",
+    id: "agt-002",
     nomor_kta: "2015.11.4589",
-    nama_lengkap: "DEMO - Budi Santoso",
+    nama_lengkap: "Budi Santoso",
     nik: "3524000000000002",
     tempat_lahir: "Lamongan",
     tanggal_lahir: "1994-08-25",
@@ -50,14 +48,14 @@ export const DEMO_ANGGOTA: Anggota[] = [
     status_verifikasi: "menunggu_verifikasi",
     foto_kta_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60",
     catatan_verifikasi: null,
-    is_demo: true,
+    is_demo: false,
     created_at: "2026-03-01T09:30:00Z",
     updated_at: "2026-03-01T09:30:00Z",
   },
   {
-    id: "demo-003",
+    id: "agt-003",
     nomor_kta: "2019.03.8821",
-    nama_lengkap: "DEMO - Siti Nurhaliza",
+    nama_lengkap: "Siti Nurhaliza",
     nik: "3524000000000003",
     tempat_lahir: "Surabaya",
     tanggal_lahir: "1999-12-05",
@@ -73,15 +71,15 @@ export const DEMO_ANGGOTA: Anggota[] = [
     status_keaktifan: "pasif",
     status_verifikasi: "perlu_koreksi",
     foto_kta_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60",
-    catatan_verifikasi: "Foto fisik KTA bagian belakang nomor seri buram. Mohon unggah ulang foto yang jelas.",
-    is_demo: true,
+    catatan_verifikasi: "Foto fisik KTA bagian nomor seri buram. Mohon unggah ulang foto yang jelas.",
+    is_demo: false,
     created_at: "2026-03-05T14:15:00Z",
     updated_at: "2026-03-06T09:00:00Z",
   },
   {
-    id: "demo-004",
+    id: "agt-004",
     nomor_kta: "2002.09.0041",
-    nama_lengkap: "DEMO - Agus Subagio",
+    nama_lengkap: "Agus Subagio",
     nik: "3524000000000004",
     tempat_lahir: "Lamongan",
     tanggal_lahir: "1980-01-15",
@@ -99,31 +97,9 @@ export const DEMO_ANGGOTA: Anggota[] = [
     foto_kta_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60",
     catatan_verifikasi: "Verifikasi sesepuh ranting Mantup sah.",
     verified_at: "2026-01-15T10:00:00Z",
-    is_demo: true,
+    is_demo: false,
     created_at: "2026-01-10T11:00:00Z",
     updated_at: "2026-01-15T10:00:00Z",
-  },
-  {
-    id: "demo-005",
-    nomor_kta: "2015.11.4589", // Contoh kasus Duplikat KTA disengaja untuk pengujian sistem
-    nama_lengkap: "DEMO - Budi S.",
-    nik: "3524000000000005",
-    tempat_lahir: "Lamongan",
-    tanggal_lahir: "1994-08-25",
-    jenis_kelamin: "L",
-    desa_id: DESA_MANTUP_LIST[1].id,
-    desa: DESA_MANTUP_LIST[1],
-    alamat_detail: "Dusun Sukobendu RT 01",
-    nomor_wa: "081234567899",
-    tingkatan: "Warga Tingkat 1",
-    tahun_pengesahan: 2015,
-    tempat_pengesahan: "Padepokan Pusat Madiun",
-    status_keaktifan: "aktif",
-    status_verifikasi: "menunggu_verifikasi",
-    catatan_verifikasi: "PERINGATAN SISTEM: Terdeteksi potensi duplikasi nomor KTA dengan id demo-002.",
-    is_demo: true,
-    created_at: "2026-03-10T16:20:00Z",
-    updated_at: "2026-03-10T16:20:00Z",
   }
 ];
 
@@ -131,7 +107,7 @@ export const DEMO_PENGAJUAN: PengajuanAnggota[] = [
   {
     id: "pengajuan-001",
     kode_tiket: "MTP-202602-001",
-    anggota_id: "demo-001",
+    anggota_id: "agt-001",
     anggota: DEMO_ANGGOTA[0],
     tipe_pengajuan: "pendataan_mandiri",
     status: "terverifikasi",
@@ -142,7 +118,7 @@ export const DEMO_PENGAJUAN: PengajuanAnggota[] = [
   {
     id: "pengajuan-002",
     kode_tiket: "MTP-202603-002",
-    anggota_id: "demo-002",
+    anggota_id: "agt-002",
     anggota: DEMO_ANGGOTA[1],
     tipe_pengajuan: "pendataan_mandiri",
     status: "menunggu_verifikasi",
@@ -153,11 +129,11 @@ export const DEMO_PENGAJUAN: PengajuanAnggota[] = [
   {
     id: "pengajuan-003",
     kode_tiket: "MTP-202603-003",
-    anggota_id: "demo-003",
+    anggota_id: "agt-003",
     anggota: DEMO_ANGGOTA[2],
     tipe_pengajuan: "input_koordinator",
     status: "perlu_koreksi",
-    catatan_revisi: "Foto fisik KTA bagian belakang nomor seri buram. Mohon unggah ulang foto yang jelas.",
+    catatan_revisi: "Foto fisik KTA bagian nomor seri buram. Mohon unggah ulang foto yang jelas.",
     created_at: "2026-03-05T14:15:00Z",
     updated_at: "2026-03-06T09:00:00Z",
   },

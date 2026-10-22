@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import { DESA_MANTUP_LIST } from "@/lib/constants/desas";
-import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge, DemoBadge } from "@/components/ui/Badge";
+import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
 import { FormPendataan } from "@/components/forms/FormPendataan";
 
 export default function KoordinatorDashboardPage() {
@@ -110,7 +110,6 @@ export default function KoordinatorDashboardPage() {
                   <td className="py-3 px-4">
                     <div className="font-bold text-stone-900 flex items-center gap-1.5">
                       <span>{a.nama_lengkap}</span>
-                      {a.is_demo && <DemoBadge />}
                     </div>
                     <div className="text-[10px] text-stone-400 font-mono">
                       WA: {a.nomor_wa}

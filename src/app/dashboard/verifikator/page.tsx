@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import { Anggota, StatusVerifikasi } from "@/types/database";
-import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge, DemoBadge } from "@/components/ui/Badge";
+import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
 
 export default function VerifikatorDashboardPage() {
   const [anggotaList, setAnggotaList] = useState<Anggota[]>(() => AnggotaService.getAll());
@@ -97,7 +97,6 @@ export default function VerifikatorDashboardPage() {
                     <div>
                       <div className="font-bold text-sm text-stone-900 flex items-center gap-1.5">
                         <span>{item.nama_lengkap}</span>
-                        {item.is_demo && <DemoBadge />}
                       </div>
                       <div className="text-xs font-mono font-bold text-amber-900 mt-0.5">
                         KTA: {item.nomor_kta || "(Belum Tercatat)"}

@@ -66,53 +66,6 @@ export default function LoginPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
-            {/* Quick Demo Access Roles */}
-            <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-4">
-              <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider block mb-2">
-                ⚡ Akses Cepat Simulasi Peran (Demo RBAC)
-              </span>
-              <p className="text-[11px] text-amber-800 mb-3">
-                Klik salah satu peran di bawah ini untuk menguji hak akses masing-masing akun:
-              </p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleLoginRole("admin_ranting")}
-                  className="p-2 rounded-lg bg-red-700 hover:bg-red-800 text-white font-semibold text-left transition shadow-xs"
-                >
-                  <span className="block font-bold text-xs">Admin Ranting</span>
-                  <span className="text-[10px] text-red-200">Akses Penuh & Duplikasi</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleLoginRole("verifikator")}
-                  className="p-2 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-semibold text-left transition shadow-xs"
-                >
-                  <span className="block font-bold text-xs">Verifikator</span>
-                  <span className="text-[10px] text-amber-200">Validasi KTA Fisik</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleLoginRole("koordinator_subranting")}
-                  className="p-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white font-semibold text-left transition shadow-xs"
-                >
-                  <span className="block font-bold text-xs">Koord. Subranting</span>
-                  <span className="text-[10px] text-stone-300">Desa Sukobendu</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleLoginRole("anggota")}
-                  className="p-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-left transition shadow-xs"
-                >
-                  <span className="block font-bold text-xs">Anggota Aktif</span>
-                  <span className="text-[10px] text-emerald-200">Profil & KTA Pribadi</span>
-                </button>
-              </div>
-            </div>
-
             {/* Standard Login Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

@@ -72,22 +72,9 @@ function CekTiketContent() {
           </button>
         </form>
 
-        {/* Quick Demo Tiket Fill */}
-        <div className="mt-4 pt-3 border-t border-stone-100 flex flex-wrap items-center gap-2 text-xs text-stone-500">
-          <span>Contoh Tiket Percobaan:</span>
-          {["MTP-202602-001", "MTP-202603-002", "MTP-202603-003"].map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => {
-                setInputTiket(code);
-                handleSearch(code);
-              }}
-              className="font-mono text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2 py-0.5 rounded transition"
-            >
-              {code}
-            </button>
-          ))}
+        <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
+          <span>Kode tiket berformat: <strong className="font-mono text-stone-700">MTP-YYYYMM-XXX</strong></span>
+          <span className="text-stone-400">Diterbitkan otomatis saat mengirim formulir</span>
         </div>
       </div>
 

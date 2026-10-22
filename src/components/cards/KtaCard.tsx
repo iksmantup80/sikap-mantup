@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Anggota } from "@/types/database";
-import { KeaktifanBadge, TingkatanBadge, VerifikasiBadge, DemoBadge } from "../ui/Badge";
+import { KeaktifanBadge, TingkatanBadge, VerifikasiBadge } from "../ui/Badge";
 
 export function KtaCard({
   anggota,
@@ -32,7 +32,6 @@ export function KtaCard({
         <div>
           <h4 className="font-extrabold text-base tracking-tight text-amber-100 flex items-center gap-2">
             IKSPI KERA SAKTI
-            {anggota.is_demo && <DemoBadge />}
           </h4>
           <p className="text-xs text-amber-300/80 font-medium">
             Ranting Mantup • Lamongan, Jawa Timur
