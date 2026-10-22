@@ -20,12 +20,19 @@ function CekTiketContent() {
   } | null>(null);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = (codeToSearch?: string) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSearch = async (codeToSearch?: string) => {
     const code = (codeToSearch || inputTiket).trim();
     if (!code) return;
-    const res = AnggotaService.getByTiket(code);
-    setResult(res);
-    setSearched(true);
+    setLoading(true);
+    try {
+      const res = await AnggotaService.getByTiketAsync(code);
+      setResult(res);
+      setSearched(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -156,19 +163,57 @@ function CekTiketContent() {
                 {/* Submitted Data Summary */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-stone-50 p-4 rounded-xl border border-stone-200">
                   <div>
+                    <span className="text-stone-400 block">Kategori Anggota:</span>
+                    <strong className="text-amber-900 uppercase">
+                      {result.anggota.kategori_anggota === "siswa" ||
+                      result.anggota.tingkatan?.startsWith("Siswa") ||
+                      result.anggota.tingkatan === "Calon Warga"
+                        ? "🥋 Siswa Latihan"
+                        : "⭐ Warga Disahkan"}
+                    </strong>
+                  </div>
+                  <div>
                     <span className="text-stone-400 block">Nama Anggota:</span>
                     <strong className="text-stone-900 text-sm block">{result.anggota.nama_lengkap}</strong>
                   </div>
                   <div>
-                    <span className="text-stone-400 block">Nomor KTA Pusat (Asli):</span>
+                    <span className="text-stone-400 block">
+                      {result.anggota.kategori_anggota === "siswa" ||
+                      result.anggota.tingkatan?.startsWith("Siswa") ||
+                      result.anggota.tingkatan === "Calon Warga"
+                        ? "Tempat Latihan:"
+                        : "No. Induk (KTA Pusat):"}
+                    </span>
                     <span className="font-mono font-bold text-amber-900">
-                      {result.anggota.nomor_kta || "(Belum Tercatat)"}
+                      {result.anggota.kategori_anggota === "siswa" ||
+                      result.anggota.tingkatan?.startsWith("Siswa") ||
+                      result.anggota.tingkatan === "Calon Warga"
+                        ? result.anggota.tempat_latihan || "Subranting Desa"
+                        : result.anggota.nomor_kta || "(Belum Tercatat / Proses Terbit)"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">
+                      {result.anggota.kategori_anggota === "siswa" ||
+                      result.anggota.tingkatan?.startsWith("Siswa") ||
+                      result.anggota.tingkatan === "Calon Warga"
+                        ? "Tahun Mulai Latihan:"
+                        : "Angkatan & Pengesahan:"}
+                    </span>
+                    <span className="font-semibold text-stone-800">
+                      {result.anggota.kategori_anggota === "siswa" ||
+                      result.anggota.tingkatan?.startsWith("Siswa") ||
+                      result.anggota.tingkatan === "Calon Warga"
+                        ? String(result.anggota.tahun_pengesahan)
+                        : `Angkatan ${result.anggota.angkatan || result.anggota.tahun_pengesahan}${
+                            result.anggota.tanggal_pengesahan ? ` • ${result.anggota.tanggal_pengesahan}` : ""
+                          }`}
                     </span>
                   </div>
                   <div>
                     <span className="text-stone-400 block">Desa Subranting:</span>
                     <span className="text-stone-800 font-medium">
-                      {result.anggota.desa?.nama_desa}
+                      {result.anggota.desa?.nama_desa || "Kecamatan Mantup"}
                     </span>
                   </div>
                   <div>

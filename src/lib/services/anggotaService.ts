@@ -44,6 +44,45 @@ export const AnggotaService = {
     return { pengajuan: p, anggota: a };
   },
 
+  getByTiketAsync: async (
+    kodeTiket: string
+  ): Promise<{ pengajuan?: PengajuanAnggota; anggota?: Anggota } | null> => {
+    // 1. Cek memory lokal lebih dahulu
+    const local = AnggotaService.getByTiket(kodeTiket);
+    if (local) return local;
+
+    // 2. Query ke Supabase Cloud
+    try {
+      const supabase = createClient();
+      const cleanCode = kodeTiket.toUpperCase().trim();
+      const { data: p, error: pErr } = await supabase
+        .from("pengajuan_anggota")
+        .select("*, anggota(*, desa:wilayah_desa(*))")
+        .ilike("kode_tiket", cleanCode)
+        .single();
+
+      if (!pErr && p && p.anggota) {
+        return {
+          pengajuan: {
+            id: p.id,
+            kode_tiket: p.kode_tiket,
+            anggota_id: p.anggota_id,
+            tipe_pengajuan: p.tipe_pengajuan,
+            status: p.status,
+            catatan_revisi: p.catatan_revisi,
+            created_at: p.created_at,
+            updated_at: p.created_at,
+          },
+          anggota: p.anggota,
+        };
+      }
+    } catch (e) {
+      console.warn("Gagal fetch tiket dari Supabase:", e);
+    }
+
+    return null;
+  },
+
   // Logika Anti-Duplikasi Otomatis
   periksaDuplikasi: (data: Partial<FormAnggotaInput>): {
     isDuplicate: boolean;
