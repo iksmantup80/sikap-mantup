@@ -124,6 +124,7 @@ export const AnggotaService = {
           .from("anggota")
           .insert({
             nomor_kta: input.nomor_kta ? input.nomor_kta.trim() : null,
+            kategori_anggota: input.kategori_anggota || "warga",
             nama_lengkap: input.nama_lengkap,
             nik: input.nik || null,
             tempat_lahir: input.tempat_lahir,
@@ -135,7 +136,9 @@ export const AnggotaService = {
             nomor_wa: input.nomor_wa,
             tingkatan: input.tingkatan,
             tahun_pengesahan: input.tahun_pengesahan,
-            tempat_pengesahan: input.tempat_pengesahan,
+            tempat_pengesahan: input.tempat_pengesahan || (input.kategori_anggota === "siswa" ? "Ranting Mantup" : "Padepokan Pusat Madiun"),
+            tempat_latihan: input.tempat_latihan || null,
+            nama_pelatih: input.nama_pelatih || null,
             status_keaktifan: input.status_keaktifan,
             status_verifikasi: "menunggu_verifikasi",
             foto_kta_url: input.foto_kta_url || null,
@@ -162,6 +165,7 @@ export const AnggotaService = {
     const newAnggota: Anggota = {
       id: newId,
       nomor_kta: input.nomor_kta ? input.nomor_kta.trim() : null,
+      kategori_anggota: input.kategori_anggota || "warga",
       nama_lengkap: input.nama_lengkap,
       nik: input.nik || null,
       tempat_lahir: input.tempat_lahir,
@@ -174,7 +178,9 @@ export const AnggotaService = {
       nomor_wa: input.nomor_wa,
       tingkatan: input.tingkatan,
       tahun_pengesahan: input.tahun_pengesahan,
-      tempat_pengesahan: input.tempat_pengesahan,
+      tempat_pengesahan: input.tempat_pengesahan || (input.kategori_anggota === "siswa" ? "Ranting Mantup" : "Padepokan Pusat Madiun"),
+      tempat_latihan: input.tempat_latihan || null,
+      nama_pelatih: input.nama_pelatih || null,
       status_keaktifan: input.status_keaktifan,
       status_verifikasi: "menunggu_verifikasi",
       foto_kta_url: input.foto_kta_url || null,

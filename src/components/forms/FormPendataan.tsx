@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { formAnggotaSchema, FormAnggotaInput } from "@/lib/validations/anggota";
+import { FormAnggotaInput } from "@/lib/validations/anggota";
 import { DESA_MANTUP_LIST } from "@/lib/constants/desas";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import Link from "next/link";
@@ -28,15 +27,16 @@ export function FormPendataan({
   } | null>(null);
   const [copiedTiket, setCopiedTiket] = useState(false);
 
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [stepError, setStepError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    trigger,
-    formState: { errors },
+    getValues,
   } = useForm<FormAnggotaInput>({
-    resolver: zodResolver(formAnggotaSchema),
     defaultValues: {
       kategori_anggota: "warga",
       nama_lengkap: "",
@@ -61,67 +61,158 @@ export function FormPendataan({
 
   const formValues = watch();
   const kategoriAnggota = watch("kategori_anggota");
-  const [stepError, setStepError] = useState<string | null>(null);
 
-  const handleNextStep = async () => {
-    setStepError(null);
-    let fieldsToValidate: (keyof FormAnggotaInput)[] = [];
-    if (step === 1) {
-      fieldsToValidate = [
-        "nama_lengkap",
-        "nik",
-        "tempat_lahir",
-        "tanggal_lahir",
-        "jenis_kelamin",
-        "nomor_wa",
-      ];
-    } else if (step === 2) {
-      fieldsToValidate = ["desa_id", "alamat_detail", "rt_rw"];
-    } else if (step === 3) {
-      fieldsToValidate = [
-        "tingkatan",
-        "tahun_pengesahan",
-        "status_keaktifan",
-      ];
+  const clearFieldError = (fieldName: string) => {
+    if (fieldErrors[fieldName]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[fieldName];
+        return next;
+      });
+    }
+  };
+
+  const validateStep = (s: number): { valid: boolean; errors: Record<string, string>; summary: string } => {
+    const errs: Record<string, string> = {};
+    const values = getValues();
+
+    if (s === 1) {
+      if (!values.nama_lengkap || values.nama_lengkap.trim().length < 2) {
+        errs.nama_lengkap = "Nama lengkap wajib diisi (minimal 2 karakter)";
+      }
+
+      const waRaw = values.nomor_wa ? String(values.nomor_wa).trim() : "";
+      const waDigits = waRaw.replace(/\D/g, "");
+      if (!waRaw) {
+        errs.nomor_wa = "Nomor WhatsApp aktif wajib diisi";
+      } else if (waDigits.length < 8) {
+        errs.nomor_wa = "Nomor WhatsApp minimal 8 digit angka";
+      } else if (!/^(?:62|0)?8[0-9]{7,12}$/.test(waDigits)) {
+        errs.nomor_wa = "Format nomor WA tidak valid (contoh: 081234567890)";
+      }
+
+      if (!values.tempat_lahir || values.tempat_lahir.trim().length < 2) {
+        errs.tempat_lahir = "Tempat lahir wajib diisi (contoh: Lamongan)";
+      }
+
+      if (!values.tanggal_lahir || isNaN(Date.parse(values.tanggal_lahir))) {
+        errs.tanggal_lahir = "Tanggal lahir wajib diisi dengan benar";
+      }
+
+      if (values.nik && values.nik.trim()) {
+        const nikDigits = values.nik.replace(/\D/g, "");
+        if (nikDigits.length !== 16) {
+          errs.nik = "NIK harus terdiri dari 16 digit angka (atau kosongkan jika belum ada)";
+        }
+      }
+    } else if (s === 2) {
+      if (!values.desa_id || !values.desa_id.trim()) {
+        errs.desa_id = "Pilih salah satu desa / subranting di Kecamatan Mantup";
+      }
+      if (!values.alamat_detail || values.alamat_detail.trim().length < 3) {
+        errs.alamat_detail = "Alamat domisili lengkap wajib diisi (minimal 3 karakter)";
+      }
+    } else if (s === 3) {
+      if (values.kategori_anggota === "warga") {
+        if (!values.tingkatan) {
+          errs.tingkatan = "Pilih tingkatan warga";
+        }
+        const yr = Number(values.tahun_pengesahan);
+        const curYr = new Date().getFullYear();
+        if (!yr || yr < 1980 || yr > curYr) {
+          errs.tahun_pengesahan = `Tahun pengesahan harus antara 1980 dan ${curYr}`;
+        }
+        if (!values.tempat_pengesahan || values.tempat_pengesahan.trim().length < 2) {
+          errs.tempat_pengesahan = "Tempat pengesahan wajib diisi (contoh: Padepokan Pusat Madiun)";
+        }
+      } else {
+        // Siswa
+        if (!values.tingkatan) {
+          errs.tingkatan = "Pilih jenjang sabuk siswa";
+        }
+        const yr = Number(values.tahun_pengesahan);
+        const curYr = new Date().getFullYear() + 2;
+        if (!yr || yr < 2000 || yr > curYr) {
+          errs.tahun_pengesahan = `Tahun mulai latihan harus antara 2000 dan ${curYr}`;
+        }
+        if (!values.tempat_latihan || values.tempat_latihan.trim().length < 2) {
+          errs.tempat_latihan = "Tempat / lokasi latihan subranting wajib diisi (contoh: SDN 1 Sukobendu)";
+        }
+      }
+      if (!values.status_keaktifan) {
+        errs.status_keaktifan = "Pilih status keaktifan latihan / organisasi";
+      }
     }
 
-    const valid = await trigger(fieldsToValidate);
+    const errList = Object.values(errs);
+    const valid = errList.length === 0;
+    const summary = valid ? "" : `Periksa kembali data Anda: ${errList.join(". ")}`;
 
-    if (valid) {
-      setStepError(null);
-      setStep((prev) => Math.min(prev + 1, 4));
+    return { valid, errors: errs, summary };
+  };
+
+  const handleNextStep = () => {
+    const { valid, errors: stepErrs, summary } = validateStep(step);
+    if (!valid) {
+      setFieldErrors(stepErrs);
+      setStepError(summary);
       if (typeof window !== "undefined") {
-        window.scrollTo({ top: 120, behavior: "smooth" });
+        window.scrollTo({ top: 180, behavior: "smooth" });
       }
-    } else {
-      const errList: string[] = [];
-      fieldsToValidate.forEach((f) => {
-        const err = errors[f];
-        if (err?.message) {
-          errList.push(err.message);
-        }
-      });
+      return;
+    }
 
-      if (errList.length > 0) {
-        setStepError(`Periksa kembali data Anda: ${errList.join(". ")}`);
-      } else {
-        setStepError("Mohon lengkapi seluruh kolom yang bertanda bintang (*) sebelum melanjutkan.");
-      }
+    setFieldErrors({});
+    setStepError(null);
+    setStep((prev) => Math.min(prev + 1, 4));
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 120, behavior: "smooth" });
     }
   };
 
   const handlePrevStep = () => {
+    setFieldErrors({});
     setStepError(null);
     setStep((prev) => Math.max(prev - 1, 1));
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 120, behavior: "smooth" });
+    }
   };
 
-  const onSubmit = async (data: FormAnggotaInput) => {
+  const onSubmit = async () => {
+    // Validasi ulang semua langkah 1-3 sebelum submit final
+    for (let s = 1; s <= 3; s++) {
+      const check = validateStep(s);
+      if (!check.valid) {
+        setStep(s);
+        setFieldErrors(check.errors);
+        setStepError(check.summary);
+        if (typeof window !== "undefined") {
+          window.scrollTo({ top: 180, behavior: "smooth" });
+        }
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     setSubmitResult(null);
 
     try {
-      // Simulate submission to AnggotaService
-      const res = await AnggotaService.submitPengajuanMandiri(data);
+      const data = getValues();
+      const cleanData: FormAnggotaInput = {
+        ...data,
+        nama_lengkap: data.nama_lengkap.trim(),
+        nik: data.nik ? data.nik.replace(/\D/g, "") : "",
+        nomor_wa: data.nomor_wa ? data.nomor_wa.replace(/\D/g, "") : "",
+        alamat_detail: data.alamat_detail.trim(),
+        tempat_lahir: data.tempat_lahir.trim(),
+        tempat_pengesahan: data.tempat_pengesahan ? data.tempat_pengesahan.trim() : "Padepokan Pusat Madiun",
+        tempat_latihan: data.tempat_latihan ? data.tempat_latihan.trim() : "",
+        nama_pelatih: data.nama_pelatih ? data.nama_pelatih.trim() : "",
+        nomor_kta: data.nomor_kta ? data.nomor_kta.trim() : "",
+      };
+
+      const res = await AnggotaService.submitPengajuanMandiri(cleanData);
       setSubmitResult(res);
       if (res.success && res.tiket) {
         if (onSuccess) onSuccess(res.tiket);
@@ -298,16 +389,18 @@ export function FormPendataan({
               <input
                 type="text"
                 placeholder="Contoh: Mochamad Arifin"
-                {...register("nama_lengkap")}
+                {...register("nama_lengkap", {
+                  onChange: () => clearFieldError("nama_lengkap"),
+                })}
                 className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                  errors.nama_lengkap
-                    ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/30"
+                  fieldErrors.nama_lengkap
+                    ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
                     : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 }`}
               />
-              {errors.nama_lengkap && (
-                <p className="text-xs text-rose-600 mt-1 font-medium">
-                  {errors.nama_lengkap.message}
+              {fieldErrors.nama_lengkap && (
+                <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                  <span>⚠️</span> {fieldErrors.nama_lengkap}
                 </p>
               )}
             </div>
@@ -321,19 +414,24 @@ export function FormPendataan({
                   type="text"
                   maxLength={16}
                   placeholder="3524xxxxxxxxxxxx"
-                  {...register("nik")}
+                  {...register("nik", {
+                    onChange: () => clearFieldError("nik"),
+                  })}
                   className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                    errors.nik
-                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/30"
+                    fieldErrors.nik
+                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
                       : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   }`}
                 />
-                {errors.nik && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{errors.nik.message}</p>
+                {fieldErrors.nik ? (
+                  <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                    <span>⚠️</span> {fieldErrors.nik}
+                  </p>
+                ) : (
+                  <span className="text-[11px] text-gray-500">
+                    Untuk verifikasi anti-duplikasi anggota ganda.
+                  </span>
                 )}
-                <span className="text-[11px] text-gray-500">
-                  Untuk verifikasi anti-duplikasi anggota ganda.
-                </span>
               </div>
 
               <div>
@@ -343,16 +441,18 @@ export function FormPendataan({
                 <input
                   type="text"
                   placeholder="081234567890"
-                  {...register("nomor_wa")}
+                  {...register("nomor_wa", {
+                    onChange: () => clearFieldError("nomor_wa"),
+                  })}
                   className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                    errors.nomor_wa
-                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/30"
+                    fieldErrors.nomor_wa
+                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
                       : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   }`}
                 />
-                {errors.nomor_wa && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">
-                    {errors.nomor_wa.message}
+                {fieldErrors.nomor_wa && (
+                  <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                    <span>⚠️</span> {fieldErrors.nomor_wa}
                   </p>
                 )}
               </div>
@@ -366,16 +466,18 @@ export function FormPendataan({
                 <input
                   type="text"
                   placeholder="Contoh: Lamongan"
-                  {...register("tempat_lahir")}
+                  {...register("tempat_lahir", {
+                    onChange: () => clearFieldError("tempat_lahir"),
+                  })}
                   className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                    errors.tempat_lahir
-                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/30"
+                    fieldErrors.tempat_lahir
+                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
                       : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   }`}
                 />
-                {errors.tempat_lahir && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">
-                    {errors.tempat_lahir.message}
+                {fieldErrors.tempat_lahir && (
+                  <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                    <span>⚠️</span> {fieldErrors.tempat_lahir}
                   </p>
                 )}
               </div>
@@ -386,16 +488,18 @@ export function FormPendataan({
                 </label>
                 <input
                   type="date"
-                  {...register("tanggal_lahir")}
+                  {...register("tanggal_lahir", {
+                    onChange: () => clearFieldError("tanggal_lahir"),
+                  })}
                   className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                    errors.tanggal_lahir
-                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/30"
+                    fieldErrors.tanggal_lahir
+                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
                       : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   }`}
                 />
-                {errors.tanggal_lahir && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">
-                    {errors.tanggal_lahir.message}
+                {fieldErrors.tanggal_lahir && (
+                  <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                    <span>⚠️</span> {fieldErrors.tanggal_lahir}
                   </p>
                 )}
               </div>
@@ -405,15 +509,21 @@ export function FormPendataan({
                   Jenis Kelamin *
                 </label>
                 <select
-                  {...register("jenis_kelamin")}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
+                  {...register("jenis_kelamin", {
+                    onChange: () => clearFieldError("jenis_kelamin"),
+                  })}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 bg-white transition ${
+                    fieldErrors.jenis_kelamin
+                      ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                      : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  }`}
                 >
                   <option value="L">Laki-Laki</option>
                   <option value="P">Perempuan</option>
                 </select>
-                {errors.jenis_kelamin && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">
-                    {errors.jenis_kelamin.message}
+                {fieldErrors.jenis_kelamin && (
+                  <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                    <span>⚠️</span> {fieldErrors.jenis_kelamin}
                   </p>
                 )}
               </div>
@@ -436,8 +546,14 @@ export function FormPendataan({
                 Pilih Desa / Subranting di Kecamatan Mantup *
               </label>
               <select
-                {...register("desa_id")}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white font-medium"
+                {...register("desa_id", {
+                  onChange: () => clearFieldError("desa_id"),
+                })}
+                className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 bg-white font-medium transition ${
+                  fieldErrors.desa_id
+                    ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                    : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                }`}
               >
                 {DESA_MANTUP_LIST.map((desa) => (
                   <option key={desa.id} value={desa.id}>
@@ -445,9 +561,9 @@ export function FormPendataan({
                   </option>
                 ))}
               </select>
-              {errors.desa_id && (
-                <p className="text-xs text-rose-600 mt-1">
-                  {errors.desa_id.message}
+              {fieldErrors.desa_id && (
+                <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                  <span>⚠️</span> {fieldErrors.desa_id}
                 </p>
               )}
             </div>
@@ -459,12 +575,18 @@ export function FormPendataan({
               <textarea
                 rows={3}
                 placeholder="Contoh: Dusun Mantup Tengah RT 02 RW 01, Dekat Balai Desa"
-                {...register("alamat_detail")}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
+                {...register("alamat_detail", {
+                  onChange: () => clearFieldError("alamat_detail"),
+                })}
+                className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
+                  fieldErrors.alamat_detail
+                    ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                    : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                }`}
               />
-              {errors.alamat_detail && (
-                <p className="text-xs text-rose-600 mt-1">
-                  {errors.alamat_detail.message}
+              {fieldErrors.alamat_detail && (
+                <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                  <span>⚠️</span> {fieldErrors.alamat_detail}
                 </p>
               )}
             </div>
@@ -591,12 +713,14 @@ export function FormPendataan({
                   <input
                     type="text"
                     placeholder="Contoh: 1998.05.0123 (Kosongkan bila belum terbit)"
-                    {...register("nomor_kta")}
+                    {...register("nomor_kta", {
+                      onChange: () => clearFieldError("nomor_kta"),
+                    })}
                     className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 font-mono"
                   />
-                  {errors.nomor_kta && (
-                    <p className="text-xs text-rose-600 mt-1">
-                      {errors.nomor_kta.message}
+                  {fieldErrors.nomor_kta && (
+                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                      <span>⚠️</span> {fieldErrors.nomor_kta}
                     </p>
                   )}
                 </div>
@@ -607,17 +731,23 @@ export function FormPendataan({
                       Tingkatan Warga *
                     </label>
                     <select
-                      {...register("tingkatan")}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
+                      {...register("tingkatan", {
+                        onChange: () => clearFieldError("tingkatan"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 bg-white transition ${
+                        fieldErrors.tingkatan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      }`}
                     >
                       <option value="Warga Tingkat 1">Warga Tingkat 1</option>
                       <option value="Warga Tingkat 2">Warga Tingkat 2</option>
                       <option value="Warga Tingkat 3">Warga Tingkat 3</option>
                       <option value="Pendekar / Warga Sepuh">Pendekar / Warga Sepuh</option>
                     </select>
-                    {errors.tingkatan && (
-                      <p className="text-xs text-rose-600 mt-1">
-                        {errors.tingkatan.message}
+                    {fieldErrors.tingkatan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.tingkatan}
                       </p>
                     )}
                   </div>
@@ -630,12 +760,18 @@ export function FormPendataan({
                       type="number"
                       min={1980}
                       max={new Date().getFullYear()}
-                      {...register("tahun_pengesahan")}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
+                      {...register("tahun_pengesahan", {
+                        onChange: () => clearFieldError("tahun_pengesahan"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
+                        fieldErrors.tahun_pengesahan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      }`}
                     />
-                    {errors.tahun_pengesahan && (
-                      <p className="text-xs text-rose-600 mt-1">
-                        {errors.tahun_pengesahan.message}
+                    {fieldErrors.tahun_pengesahan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.tahun_pengesahan}
                       </p>
                     )}
                   </div>
@@ -648,12 +784,18 @@ export function FormPendataan({
                   <input
                     type="text"
                     placeholder="Contoh: Padepokan Pusat Madiun / Cabang Lamongan"
-                    {...register("tempat_pengesahan")}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
+                    {...register("tempat_pengesahan", {
+                      onChange: () => clearFieldError("tempat_pengesahan"),
+                    })}
+                    className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
+                      fieldErrors.tempat_pengesahan
+                        ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                        : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    }`}
                   />
-                  {errors.tempat_pengesahan && (
-                    <p className="text-xs text-rose-600 mt-1">
-                      {errors.tempat_pengesahan.message}
+                  {fieldErrors.tempat_pengesahan && (
+                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                      <span>⚠️</span> {fieldErrors.tempat_pengesahan}
                     </p>
                   )}
                 </div>
@@ -673,17 +815,23 @@ export function FormPendataan({
                       Jenjang Sabuk Siswa *
                     </label>
                     <select
-                      {...register("tingkatan")}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900 bg-white font-medium"
+                      {...register("tingkatan", {
+                        onChange: () => clearFieldError("tingkatan"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 bg-white font-medium transition ${
+                        fieldErrors.tingkatan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      }`}
                     >
                       <option value="Siswa Sabuk Kuning">Siswa Sabuk Kuning</option>
                       <option value="Siswa Sabuk Biru">Siswa Sabuk Biru</option>
                       <option value="Siswa Sabuk Merah">Siswa Sabuk Merah</option>
                       <option value="Calon Warga">Calon Warga (Persiapan Pengesahan)</option>
                     </select>
-                    {errors.tingkatan && (
-                      <p className="text-xs text-rose-600 mt-1">
-                        {errors.tingkatan.message}
+                    {fieldErrors.tingkatan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.tingkatan}
                       </p>
                     )}
                   </div>
@@ -696,12 +844,18 @@ export function FormPendataan({
                       type="number"
                       min={2000}
                       max={new Date().getFullYear() + 2}
-                      {...register("tahun_pengesahan")}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900"
+                      {...register("tahun_pengesahan", {
+                        onChange: () => clearFieldError("tahun_pengesahan"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
+                        fieldErrors.tahun_pengesahan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      }`}
                     />
-                    {errors.tahun_pengesahan && (
-                      <p className="text-xs text-rose-600 mt-1">
-                        {errors.tahun_pengesahan.message}
+                    {fieldErrors.tahun_pengesahan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.tahun_pengesahan}
                       </p>
                     )}
                   </div>
@@ -715,9 +869,20 @@ export function FormPendataan({
                     <input
                       type="text"
                       placeholder="Contoh: SDN 1 Sukobendu / Halaman Balai Desa"
-                      {...register("tempat_latihan")}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900"
+                      {...register("tempat_latihan", {
+                        onChange: () => clearFieldError("tempat_latihan"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
+                        fieldErrors.tempat_latihan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      }`}
                     />
+                    {fieldErrors.tempat_latihan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.tempat_latihan}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -727,7 +892,9 @@ export function FormPendataan({
                     <input
                       type="text"
                       placeholder="Contoh: Mas Joko / Mas Arifin"
-                      {...register("nama_pelatih")}
+                      {...register("nama_pelatih", {
+                        onChange: () => clearFieldError("nama_pelatih"),
+                      })}
                       className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900"
                     />
                   </div>
@@ -741,17 +908,23 @@ export function FormPendataan({
                 Status Keaktifan Latihan / Organisasi *
               </label>
               <select
-                {...register("status_keaktifan")}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
+                {...register("status_keaktifan", {
+                  onChange: () => clearFieldError("status_keaktifan"),
+                })}
+                className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 bg-white transition ${
+                  fieldErrors.status_keaktifan
+                    ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                    : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                }`}
               >
                 <option value="aktif">Aktif (Rutin Mengikuti Latihan / Kegiatan Ranting Mantup)</option>
                 <option value="pasif">Pasif (Lama Tidak Latihan / Izin Sementara)</option>
                 <option value="mutasi_keluar">Mutasi Keluar (Pindah Tempat Latihan / Wilayah Luar)</option>
                 <option value="meninggal">Wafat / Almarhum (Pencatatan Sejarah)</option>
               </select>
-              {errors.status_keaktifan && (
-                <p className="text-xs text-rose-600 mt-1">
-                  {errors.status_keaktifan.message}
+              {fieldErrors.status_keaktifan && (
+                <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                  <span>⚠️</span> {fieldErrors.status_keaktifan}
                 </p>
               )}
             </div>
@@ -831,9 +1004,14 @@ export function FormPendataan({
 
         {/* Step Error Notification Banner */}
         {stepError && (
-          <div className="p-3.5 rounded-xl bg-rose-50 border-2 border-rose-300 text-rose-800 text-xs font-semibold flex items-center gap-2.5 shadow-xs animate-shake">
-            <span className="text-lg shrink-0">⚠️</span>
-            <span>{stepError}</span>
+          <div className="p-4 rounded-xl bg-rose-50 border-2 border-rose-300 text-rose-900 text-xs font-semibold flex items-start gap-3 shadow-md animate-shake">
+            <span className="text-xl shrink-0">⚠️</span>
+            <div className="space-y-1">
+              <strong className="block font-bold text-rose-950 text-sm">
+                Periksa Kolom yang Ditandai Merah
+              </strong>
+              <p className="text-rose-800 leading-relaxed">{stepError}</p>
+            </div>
           </div>
         )}
 
