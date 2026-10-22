@@ -40,17 +40,24 @@ export const formAnggotaSchema = z.object({
       /^(?:\+62|62|0)8[1-9][0-9]{6,10}$/,
       "Format nomor WA tidak valid (contoh: 081234567890)"
     ),
+  kategori_anggota: z.enum(["warga", "siswa"]).default("warga"),
   tingkatan: z.enum(
     [
       "Warga Tingkat 1",
       "Warga Tingkat 2",
       "Warga Tingkat 3",
       "Pendekar / Warga Sepuh",
+      "Siswa Sabuk Kuning",
+      "Siswa Sabuk Biru",
+      "Siswa Sabuk Merah",
+      "Calon Warga",
     ],
     {
-      message: "Pilih tingkatan sabuk / warga",
+      message: "Pilih tingkatan sabuk warga / siswa",
     }
   ),
+  tempat_latihan: z.string().optional(),
+  nama_pelatih: z.string().optional(),
   tahun_pengesahan: z.coerce
     .number()
     .int()

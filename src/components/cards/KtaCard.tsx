@@ -11,16 +11,31 @@ export function KtaCard({
   anggota: Anggota;
   showActions?: boolean;
 }) {
+  const isSiswa =
+    anggota.kategori_anggota === "siswa" ||
+    anggota.tingkatan?.startsWith("Siswa") ||
+    anggota.tingkatan === "Calon Warga";
+
   return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-stone-900 via-stone-800 to-amber-950 text-white shadow-xl max-w-md w-full p-5 transition hover:shadow-2xl">
+    <div
+      className={`relative overflow-hidden rounded-2xl border-2 text-white shadow-xl max-w-md w-full p-5 transition hover:shadow-2xl ${
+        isSiswa
+          ? "border-indigo-400 bg-gradient-to-br from-stone-900 via-stone-850 to-indigo-950"
+          : "border-amber-300 bg-gradient-to-br from-stone-900 via-stone-800 to-amber-950"
+      }`}
+    >
       {/* Background Watermark */}
       <div className="absolute -right-10 -bottom-10 opacity-5 pointer-events-none text-9xl font-black select-none tracking-tighter text-amber-200">
         IKSPI
       </div>
 
       <div className="absolute top-2 right-3 pointer-events-none">
-        <span className="text-[10px] uppercase tracking-widest text-amber-300/60 font-mono">
-          INTERNAL RANTING MANTUP
+        <span
+          className={`text-[10px] uppercase tracking-widest font-mono ${
+            isSiswa ? "text-indigo-300/80" : "text-amber-300/60"
+          }`}
+        >
+          {isSiswa ? "KARTU SISWA • RANTING MANTUP" : "INTERNAL RANTING MANTUP"}
         </span>
       </div>
 
@@ -88,17 +103,25 @@ export function KtaCard({
 
           <div>
             <span className="text-stone-400 text-[10px] block uppercase font-medium">
-              Nomor KTA Pusat (Asli)
+              {isSiswa ? "Tempat Latihan / Diklat" : "Nomor KTA Pusat (Asli)"}
             </span>
-            <span className="font-mono font-bold text-amber-300 text-xs">
-              {anggota.nomor_kta || "(Belum Tercatat / Proses Terbit)"}
+            <span
+              className={`font-bold text-xs ${
+                isSiswa ? "text-indigo-200" : "font-mono text-amber-300"
+              }`}
+            >
+              {isSiswa
+                ? anggota.tempat_latihan || "Subranting Desa Mantup"
+                : anggota.nomor_kta || "(Belum Tercatat / Proses Terbit)"}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <TingkatanBadge tingkatan={anggota.tingkatan} />
             <span className="text-[11px] text-stone-300">
-              Angkatan {anggota.tahun_pengesahan}
+              {isSiswa
+                ? `Target Pengesahan ${anggota.tahun_pengesahan}`
+                : `Angkatan ${anggota.tahun_pengesahan}`}
             </span>
           </div>
 
@@ -124,9 +147,11 @@ export function KtaCard({
         </span>
       </div>
 
-      {/* Legal & Anti-Fraud Notice */}
+      {/* Legal Notice */}
       <div className="mt-3 bg-stone-950/60 px-2.5 py-1.5 rounded-md border border-stone-800 text-[10px] text-stone-400 text-center">
-        Identitas arsip database internal Ranting Mantup. Bukan KTA fisik resmi pengganti dari Pengurus Pusat Madiun.
+        {isSiswa
+          ? "Kartu Tanda Siswa (KTS) internal Ranting Mantup untuk pembinaan latihan sabuk."
+          : "Identitas arsip database internal Ranting Mantup. Bukan KTA fisik resmi pengganti dari Pengurus Pusat Madiun."}
       </div>
     </div>
   );

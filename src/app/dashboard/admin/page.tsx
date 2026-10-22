@@ -3,11 +3,12 @@
 import React, { useState } from "react";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import { DESA_MANTUP_LIST } from "@/lib/constants/desas";
-import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
+import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge, KategoriBadge } from "@/components/ui/Badge";
 import { Anggota, DuplikatCandidate, StatusVerifikasi } from "@/types/database";
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<"master" | "verifikasi" | "duplikat" | "desa">("master");
+  const [filterKategori, setFilterKategori] = useState<string>("");
   const [filterDesa, setFilterDesa] = useState<string>("");
   const [filterKeaktifan, setFilterKeaktifan] = useState<string>("");
   const [filterVerifikasi, setFilterVerifikasi] = useState<string>("");
@@ -25,11 +26,19 @@ export default function AdminDashboardPage() {
     (a) => a.status_verifikasi === "menunggu_verifikasi" || a.status_verifikasi === "perlu_koreksi"
   );
 
-  const anggotaList = AnggotaService.getAll({
+  const rawList = AnggotaService.getAll({
     desa_id: filterDesa || undefined,
     status_keaktifan: filterKeaktifan || undefined,
     status_verifikasi: filterVerifikasi || undefined,
     search: searchQuery || undefined,
+  });
+
+  const anggotaList = rawList.filter((a) => {
+    if (!filterKategori) return true;
+    const isSiswa = a.kategori_anggota === "siswa" || a.tingkatan?.startsWith("Siswa") || a.tingkatan === "Calon Warga";
+    if (filterKategori === "siswa") return isSiswa;
+    if (filterKategori === "warga") return !isSiswa;
+    return true;
   });
 
   const duplikatList = AnggotaService.getDaftarKandidatDuplikat();
@@ -253,6 +262,16 @@ export default function AdminDashboardPage() {
 
             <div className="flex flex-wrap gap-2 items-center text-xs">
               <select
+                value={filterKategori}
+                onChange={(e) => setFilterKategori(e.target.value)}
+                className="px-2.5 py-2 rounded-lg border border-stone-300 text-stone-700 bg-white font-medium"
+              >
+                <option value="">Semua Kategori (Warga & Siswa)</option>
+                <option value="warga">⭐ Khusus Warga</option>
+                <option value="siswa">🥋 Khusus Siswa</option>
+              </select>
+
+              <select
                 value={filterDesa}
                 onChange={(e) => setFilterDesa(e.target.value)}
                 className="px-2.5 py-2 rounded-lg border border-stone-300 text-stone-700 bg-white"
@@ -297,8 +316,8 @@ export default function AdminDashboardPage() {
               <table className="w-full text-left text-xs text-stone-700">
                 <thead className="bg-stone-50 border-b border-stone-200 text-stone-500 font-semibold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="py-3 px-4">Nama Lengkap</th>
-                    <th className="py-3 px-4">Nomor KTA Pusat</th>
+                    <th className="py-3 px-4">Nama & Kategori</th>
+                    <th className="py-3 px-4">KTA / Tempat Latihan</th>
                     <th className="py-3 px-4">Desa Subranting</th>
                     <th className="py-3 px-4">Tingkatan / Angkatan</th>
                     <th className="py-3 px-4">Status Keaktifan</th>
@@ -307,49 +326,72 @@ export default function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {anggotaList.map((a) => (
-                    <tr key={a.id} className="hover:bg-amber-50/40 transition">
-                      <td className="py-3 px-4">
-                        <div className="font-bold text-stone-900 flex items-center gap-1.5">
-                          <span>{a.nama_lengkap}</span>
-                        </div>
-                        <div className="text-[10px] text-stone-400 font-mono">
-                          NIK: {a.nik || "-"} • WA: {a.nomor_wa}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 font-mono font-bold text-amber-900">
-                        {a.nomor_kta || <span className="text-stone-400 font-normal">Belum Tercatat</span>}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="font-medium text-stone-800">
-                          {a.desa?.nama_desa || "-"}
-                        </span>
-                        <div className="text-[10px] text-stone-400">
-                          {a.alamat_detail}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <TingkatanBadge tingkatan={a.tingkatan} />
-                        <div className="text-[10px] text-stone-500 mt-0.5">
-                          Tahun {a.tahun_pengesahan}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <KeaktifanBadge status={a.status_keaktifan} />
-                      </td>
-                      <td className="py-3 px-4">
-                        <VerifikasiBadge status={a.status_verifikasi} />
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          onClick={() => setSelectedAnggota(a)}
-                          className="px-2.5 py-1 text-xs bg-stone-100 hover:bg-stone-200 text-stone-800 rounded font-semibold transition"
-                        >
-                          Detail
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {anggotaList.map((a) => {
+                    const isSiswa =
+                      a.kategori_anggota === "siswa" ||
+                      a.tingkatan?.startsWith("Siswa") ||
+                      a.tingkatan === "Calon Warga";
+
+                    return (
+                      <tr key={a.id} className="hover:bg-amber-50/40 transition">
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-stone-900 flex items-center gap-1.5 flex-wrap">
+                            <span>{a.nama_lengkap}</span>
+                            <KategoriBadge kategori={isSiswa ? "siswa" : "warga"} />
+                          </div>
+                          <div className="text-[10px] text-stone-400 font-mono mt-0.5">
+                            NIK: {a.nik || "-"} • WA: {a.nomor_wa}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          {isSiswa ? (
+                            <div>
+                              <span className="text-indigo-900 font-bold block">
+                                {a.tempat_latihan || "Subranting Mantup"}
+                              </span>
+                              {a.nama_pelatih && (
+                                <span className="text-[10px] text-stone-500 block">
+                                  Pelatih: {a.nama_pelatih}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="font-mono font-bold text-amber-900">
+                              {a.nomor_kta || <span className="text-stone-400 font-normal">Belum Tercatat</span>}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="font-medium text-stone-800">
+                            {a.desa?.nama_desa || "-"}
+                          </span>
+                          <div className="text-[10px] text-stone-400">
+                            {a.alamat_detail}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <TingkatanBadge tingkatan={a.tingkatan} />
+                          <div className="text-[10px] text-stone-500 mt-0.5">
+                            {isSiswa ? `Target ${a.tahun_pengesahan}` : `Angkatan ${a.tahun_pengesahan}`}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <KeaktifanBadge status={a.status_keaktifan} />
+                        </td>
+                        <td className="py-3 px-4">
+                          <VerifikasiBadge status={a.status_verifikasi} />
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            onClick={() => setSelectedAnggota(a)}
+                            className="px-2.5 py-1 text-xs bg-stone-100 hover:bg-stone-200 text-stone-800 rounded font-semibold transition"
+                          >
+                            Detail
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -706,12 +748,38 @@ export default function AdminDashboardPage() {
             <div className="space-y-2 text-xs">
               <div className="grid grid-cols-2 gap-2">
                 <div>
+                  <span className="text-stone-400 block">Kategori Anggota:</span>
+                  <span className="font-bold text-amber-900">
+                    {selectedAnggota.kategori_anggota === "siswa" ||
+                    selectedAnggota.tingkatan?.startsWith("Siswa") ||
+                    selectedAnggota.tingkatan === "Calon Warga"
+                      ? "🥋 Siswa Latihan"
+                      : "⭐ Warga Disahkan"}
+                  </span>
+                </div>
+                <div>
                   <span className="text-stone-400 block">Nama Lengkap:</span>
                   <span className="font-bold text-stone-900">{selectedAnggota.nama_lengkap}</span>
                 </div>
                 <div>
-                  <span className="text-stone-400 block">Nomor KTA Pusat:</span>
-                  <span className="font-mono font-bold text-amber-900">{selectedAnggota.nomor_kta || "Belum ada"}</span>
+                  <span className="text-stone-400 block">
+                    {selectedAnggota.kategori_anggota === "siswa" ||
+                    selectedAnggota.tingkatan?.startsWith("Siswa") ||
+                    selectedAnggota.tingkatan === "Calon Warga"
+                      ? "Tempat Latihan:"
+                      : "Nomor KTA Pusat:"}
+                  </span>
+                  <span className="font-mono font-bold text-amber-900">
+                    {selectedAnggota.kategori_anggota === "siswa" ||
+                    selectedAnggota.tingkatan?.startsWith("Siswa") ||
+                    selectedAnggota.tingkatan === "Calon Warga"
+                      ? selectedAnggota.tempat_latihan || "Subranting Desa"
+                      : selectedAnggota.nomor_kta || "Belum ada"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-stone-400 block">Tingkatan / Sabuk:</span>
+                  <span className="font-bold text-stone-900">{selectedAnggota.tingkatan}</span>
                 </div>
                 <div>
                   <span className="text-stone-400 block">NIK:</span>

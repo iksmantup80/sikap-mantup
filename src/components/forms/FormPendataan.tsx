@@ -38,6 +38,7 @@ export function FormPendataan({
   } = useForm<FormAnggotaInput>({
     resolver: zodResolver(formAnggotaSchema),
     defaultValues: {
+      kategori_anggota: "warga",
       nama_lengkap: "",
       nik: "",
       nomor_kta: "",
@@ -51,12 +52,15 @@ export function FormPendataan({
       tingkatan: "Warga Tingkat 1",
       tahun_pengesahan: 2018,
       tempat_pengesahan: "Padepokan Pusat Madiun",
+      tempat_latihan: "",
+      nama_pelatih: "",
       status_keaktifan: "aktif",
       is_demo: false,
     },
   });
 
   const formValues = watch();
+  const kategoriAnggota = watch("kategori_anggota");
 
   const handleNextStep = async () => {
     let valid = false;
@@ -440,112 +444,275 @@ export function FormPendataan({
 
         {/* STEP 3: RIWAYAT KEANGGOTAAN IKSPI */}
         {step === 3 && (
-          <div className="space-y-4 animate-fade-in">
+          <div className="space-y-5 animate-fade-in">
             <h3 className="text-base font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold">
                 3
               </span>
-              Riwayat Keanggotaan IKSPI Kera Sakti
+              Kategori & Riwayat Keanggotaan IKSPI Kera Sakti
             </h3>
 
-            <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-800">
-              <strong>Aturan Pencatatan KTA:</strong> Catat nomor KTA persis sebagaimana tercetak pada fisik kartu resmi yang diterbitkan Pusat Madiun. Sistem ranting tidak akan mengubah nomor ataupun mencetak KTA pengganti.
+            {/* Pilihan Wajib: Warga vs Siswa */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-gray-800 uppercase tracking-wider">
+                Status Keanggotaan Anda di IKSPI Mantup *
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  onClick={() => {
+                    setValue("kategori_anggota", "warga");
+                    if (formValues.tingkatan?.startsWith("Siswa") || formValues.tingkatan === "Calon Warga") {
+                      setValue("tingkatan", "Warga Tingkat 1");
+                      setValue("tempat_pengesahan", "Padepokan Pusat Madiun");
+                    }
+                  }}
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition ${
+                    kategoriAnggota === "warga"
+                      ? "bg-amber-50/90 border-amber-600 shadow-sm ring-1 ring-amber-400"
+                      : "bg-white border-gray-200 hover:border-amber-300 shadow-xs"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <input
+                      type="radio"
+                      value="warga"
+                      checked={kategoriAnggota === "warga"}
+                      onChange={() => {
+                        setValue("kategori_anggota", "warga");
+                        if (formValues.tingkatan?.startsWith("Siswa") || formValues.tingkatan === "Calon Warga") {
+                          setValue("tingkatan", "Warga Tingkat 1");
+                          setValue("tempat_pengesahan", "Padepokan Pusat Madiun");
+                        }
+                      }}
+                      className="text-amber-600 focus:ring-amber-500"
+                    />
+                    <strong className="text-sm font-black text-amber-950">
+                      ⭐ Warga IKSPI Kera Sakti
+                    </strong>
+                  </div>
+                  <p className="text-xs text-stone-600 pl-5 leading-relaxed">
+                    Sudah disahkan resmi oleh Pusat Madiun / Cabang (memiliki tingkatan Warga Tk. 1, 2, 3, atau Pendekar).
+                  </p>
+                </div>
+
+                <div
+                  onClick={() => {
+                    setValue("kategori_anggota", "siswa");
+                    if (!formValues.tingkatan?.startsWith("Siswa") && formValues.tingkatan !== "Calon Warga") {
+                      setValue("tingkatan", "Siswa Sabuk Kuning");
+                      setValue("tempat_pengesahan", "Ranting Mantup");
+                      setValue("nomor_kta", "");
+                    }
+                  }}
+                  className={`p-3.5 rounded-xl border-2 cursor-pointer transition ${
+                    kategoriAnggota === "siswa"
+                      ? "bg-indigo-50/90 border-indigo-600 shadow-sm ring-1 ring-indigo-400"
+                      : "bg-white border-gray-200 hover:border-indigo-300 shadow-xs"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <input
+                      type="radio"
+                      value="siswa"
+                      checked={kategoriAnggota === "siswa"}
+                      onChange={() => {
+                        setValue("kategori_anggota", "siswa");
+                        if (!formValues.tingkatan?.startsWith("Siswa") && formValues.tingkatan !== "Calon Warga") {
+                          setValue("tingkatan", "Siswa Sabuk Kuning");
+                          setValue("tempat_pengesahan", "Ranting Mantup");
+                          setValue("nomor_kta", "");
+                        }
+                      }}
+                      className="text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <strong className="text-sm font-black text-indigo-950">
+                      🥋 Siswa Latihan / Calon Warga
+                    </strong>
+                  </div>
+                  <p className="text-xs text-stone-600 pl-5 leading-relaxed">
+                    Sedang menempuh jenjang sabuk (Kuning, Biru, Merah) atau calon warga latihan di subranting desa Kec. Mantup.
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {/* FORM KHUSUS WARGA */}
+            {kategoriAnggota === "warga" && (
+              <div className="space-y-4 pt-2">
+                <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-800">
+                  <strong>Aturan Pencatatan KTA:</strong> Catat nomor KTA persis sebagaimana tercetak pada fisik kartu resmi yang diterbitkan Pusat Madiun. Sistem ranting tidak akan mengubah nomor ataupun mencetak KTA pengganti.
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                    Nomor KTA Pusat (Tercetak di Kartu Fisik)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 1998.05.0123 (Kosongkan bila belum terbit)"
+                    {...register("nomor_kta")}
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 font-mono"
+                  />
+                  {errors.nomor_kta && (
+                    <p className="text-xs text-rose-600 mt-1">
+                      {errors.nomor_kta.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Tingkatan Warga *
+                    </label>
+                    <select
+                      {...register("tingkatan")}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
+                    >
+                      <option value="Warga Tingkat 1">Warga Tingkat 1</option>
+                      <option value="Warga Tingkat 2">Warga Tingkat 2</option>
+                      <option value="Warga Tingkat 3">Warga Tingkat 3</option>
+                      <option value="Pendekar / Warga Sepuh">Pendekar / Warga Sepuh</option>
+                    </select>
+                    {errors.tingkatan && (
+                      <p className="text-xs text-rose-600 mt-1">
+                        {errors.tingkatan.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Tahun Pengesahan Warga *
+                    </label>
+                    <input
+                      type="number"
+                      min={1980}
+                      max={new Date().getFullYear()}
+                      {...register("tahun_pengesahan")}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
+                    />
+                    {errors.tahun_pengesahan && (
+                      <p className="text-xs text-rose-600 mt-1">
+                        {errors.tahun_pengesahan.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                    Tempat Pengesahan *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Padepokan Pusat Madiun / Cabang Lamongan"
+                    {...register("tempat_pengesahan")}
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
+                  />
+                  {errors.tempat_pengesahan && (
+                    <p className="text-xs text-rose-600 mt-1">
+                      {errors.tempat_pengesahan.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* FORM KHUSUS SISWA */}
+            {kategoriAnggota === "siswa" && (
+              <div className="space-y-4 pt-2">
+                <div className="bg-indigo-50 border border-indigo-200 p-3 rounded-lg text-xs text-indigo-900">
+                  <strong>Pencatatan Siswa:</strong> Seluruh siswa aktif di 15 subranting desa Kec. Mantup wajib terdata untuk monitoring jenjang sabuk, keaktifan latihan, dan kesiapan pengesahan.
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Jenjang Sabuk Siswa *
+                    </label>
+                    <select
+                      {...register("tingkatan")}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900 bg-white font-medium"
+                    >
+                      <option value="Siswa Sabuk Kuning">Siswa Sabuk Kuning</option>
+                      <option value="Siswa Sabuk Biru">Siswa Sabuk Biru</option>
+                      <option value="Siswa Sabuk Merah">Siswa Sabuk Merah</option>
+                      <option value="Calon Warga">Calon Warga (Persiapan Pengesahan)</option>
+                    </select>
+                    {errors.tingkatan && (
+                      <p className="text-xs text-rose-600 mt-1">
+                        {errors.tingkatan.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Tahun Mulai Latihan / Target Pengesahan *
+                    </label>
+                    <input
+                      type="number"
+                      min={2000}
+                      max={new Date().getFullYear() + 2}
+                      {...register("tahun_pengesahan")}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900"
+                    />
+                    {errors.tahun_pengesahan && (
+                      <p className="text-xs text-rose-600 mt-1">
+                        {errors.tahun_pengesahan.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Tempat / Lokasi Latihan Subranting *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: SDN 1 Sukobendu / Halaman Balai Desa"
+                      {...register("tempat_latihan")}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Nama Pelatih / Pembina Rayon
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: Mas Joko / Mas Arifin"
+                      {...register("nama_pelatih")}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-gray-900"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Status Keaktifan (Berlaku untuk Warga & Siswa) */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                Nomor KTA Pusat (Tercetak di Kartu Fisik)
+                Status Keaktifan Latihan / Organisasi *
               </label>
-              <input
-                type="text"
-                placeholder="Contoh: 1998.05.0123 (Kosongkan bila belum terbit)"
-                {...register("nomor_kta")}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 font-mono"
-              />
-              {errors.nomor_kta && (
+              <select
+                {...register("status_keaktifan")}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
+              >
+                <option value="aktif">Aktif (Rutin Mengikuti Latihan / Kegiatan Ranting Mantup)</option>
+                <option value="pasif">Pasif (Lama Tidak Latihan / Izin Sementara)</option>
+                <option value="mutasi_keluar">Mutasi Keluar (Pindah Tempat Latihan / Wilayah Luar)</option>
+                <option value="meninggal">Wafat / Almarhum (Pencatatan Sejarah)</option>
+              </select>
+              {errors.status_keaktifan && (
                 <p className="text-xs text-rose-600 mt-1">
-                  {errors.nomor_kta.message}
+                  {errors.status_keaktifan.message}
                 </p>
               )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                  Tingkatan Warga *
-                </label>
-                <select
-                  {...register("tingkatan")}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
-                >
-                  <option value="Warga Tingkat 1">Warga Tingkat 1</option>
-                  <option value="Warga Tingkat 2">Warga Tingkat 2</option>
-                  <option value="Warga Tingkat 3">Warga Tingkat 3</option>
-                  <option value="Pendekar / Warga Sepuh">Pendekar / Warga Sepuh</option>
-                </select>
-                {errors.tingkatan && (
-                  <p className="text-xs text-rose-600 mt-1">
-                    {errors.tingkatan.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                  Tahun Pengesahan *
-                </label>
-                <input
-                  type="number"
-                  min={1980}
-                  max={new Date().getFullYear()}
-                  {...register("tahun_pengesahan")}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
-                />
-                {errors.tahun_pengesahan && (
-                  <p className="text-xs text-rose-600 mt-1">
-                    {errors.tahun_pengesahan.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                  Tempat Pengesahan *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Contoh: Padepokan Pusat Madiun"
-                  {...register("tempat_pengesahan")}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900"
-                />
-                {errors.tempat_pengesahan && (
-                  <p className="text-xs text-rose-600 mt-1">
-                    {errors.tempat_pengesahan.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                  Status Keaktifan Saat Ini *
-                </label>
-                <select
-                  {...register("status_keaktifan")}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 bg-white"
-                >
-                  <option value="aktif">Aktif (Mengikuti Latihan / Kegiatan Ranting)</option>
-                  <option value="pasif">Pasif (Lama Tidak Latihan / Belum Aktif)</option>
-                  <option value="mutasi_keluar">Mutasi Keluar (Pindah Wilayah / Luar Kota)</option>
-                  <option value="meninggal">Wafat / Almarhum (Pencatatan Sejarah)</option>
-                </select>
-                {errors.status_keaktifan && (
-                  <p className="text-xs text-rose-600 mt-1">
-                    {errors.status_keaktifan.message}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -563,21 +730,32 @@ export function FormPendataan({
             <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 text-xs space-y-2 text-stone-700">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-stone-400 block">Nama Lengkap:</span>
-                  <strong className="text-gray-900 text-sm">{formValues.nama_lengkap}</strong>
-                </div>
-                <div>
-                  <span className="text-stone-400 block">Nomor KTA:</span>
-                  <strong className="text-amber-800 font-mono">
-                    {formValues.nomor_kta || "(Belum Tercatat)"}
+                  <span className="text-stone-400 block">Kategori Anggota:</span>
+                  <strong className="text-amber-900 uppercase">
+                    {formValues.kategori_anggota === "siswa" ? "🥋 Siswa Latihan" : "⭐ Warga Disahkan"}
                   </strong>
                 </div>
                 <div>
-                  <span className="text-stone-400 block">Tempat/Tgl Lahir:</span>
-                  <span>
-                    {formValues.tempat_lahir}, {formValues.tanggal_lahir}
-                  </span>
+                  <span className="text-stone-400 block">Nama Lengkap:</span>
+                  <strong className="text-gray-900 text-sm">{formValues.nama_lengkap}</strong>
                 </div>
+
+                {formValues.kategori_anggota === "warga" ? (
+                  <div>
+                    <span className="text-stone-400 block">Nomor KTA:</span>
+                    <strong className="text-amber-800 font-mono">
+                      {formValues.nomor_kta || "(Belum Tercatat)"}
+                    </strong>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="text-stone-400 block">Tempat Latihan:</span>
+                    <strong className="text-indigo-900">
+                      {formValues.tempat_latihan || "Subranting Desa"}
+                    </strong>
+                  </div>
+                )}
+
                 <div>
                   <span className="text-stone-400 block">WhatsApp:</span>
                   <span>{formValues.nomor_wa}</span>
@@ -589,14 +767,14 @@ export function FormPendataan({
                   </span>
                 </div>
                 <div>
-                  <span className="text-stone-400 block">Tingkatan & Angkatan:</span>
+                  <span className="text-stone-400 block">Tingkatan / Sabuk:</span>
                   <span>
                     {formValues.tingkatan} ({formValues.tahun_pengesahan})
                   </span>
                 </div>
                 <div>
                   <span className="text-stone-400 block">Status Keaktifan:</span>
-                  <span className="capitalize">{formValues.status_keaktifan}</span>
+                  <span className="capitalize font-semibold text-emerald-800">{formValues.status_keaktifan}</span>
                 </div>
               </div>
             </div>
@@ -604,7 +782,7 @@ export function FormPendataan({
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1">
               <p className="font-bold">Pernyataan Kejujuran & Keabsahan:</p>
               <p>
-                Saya menyatakan bahwa data yang dimasukkan adalah benar data keanggotaan IKSPI Kera Sakti saya, dan siap diverifikasi oleh verifikator Ranting Mantup.
+                Saya menyatakan bahwa data yang dimasukkan adalah benar data keanggotaan (Warga/Siswa) IKSPI Kera Sakti saya di wilayah Ranting Mantup, dan siap diverifikasi oleh pengurus.
               </p>
             </div>
           </div>

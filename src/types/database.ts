@@ -18,11 +18,17 @@ export type StatusVerifikasi =
   | 'terverifikasi'
   | 'ditolak';
 
+export type KategoriAnggota = 'warga' | 'siswa';
+
 export type TingkatanWarga =
   | 'Warga Tingkat 1'
   | 'Warga Tingkat 2'
   | 'Warga Tingkat 3'
-  | 'Pendekar / Warga Sepuh';
+  | 'Pendekar / Warga Sepuh'
+  | 'Siswa Sabuk Kuning'
+  | 'Siswa Sabuk Biru'
+  | 'Siswa Sabuk Merah'
+  | 'Calon Warga';
 
 export type JenisKelamin = 'L' | 'P';
 
@@ -54,7 +60,8 @@ export interface Profile {
 
 export interface Anggota {
   id: string;
-  nomor_kta?: string | null; // Nomor KTA resmi fisik dari Pusat Madiun
+  kategori_anggota?: KategoriAnggota; // 'warga' atau 'siswa'
+  nomor_kta?: string | null; // Nomor KTA resmi fisik dari Pusat Madiun (khusus Warga)
   nama_lengkap: string;
   nik?: string | null;
   tempat_lahir: string;
@@ -66,8 +73,10 @@ export interface Anggota {
   rt_rw?: string | null;
   nomor_wa: string;
   tingkatan: TingkatanWarga;
-  tahun_pengesahan: number;
-  tempat_pengesahan: string;
+  tahun_pengesahan: number; // Untuk siswa: tahun mulai latihan / angkatan
+  tempat_pengesahan: string; // Untuk siswa: tempat latihan/diklat ranting
+  tempat_latihan?: string | null;
+  nama_pelatih?: string | null;
   status_keaktifan: StatusKeaktifan;
   status_verifikasi: StatusVerifikasi;
   foto_kta_url?: string | null;
