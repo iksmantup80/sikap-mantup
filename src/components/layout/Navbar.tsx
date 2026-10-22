@@ -12,7 +12,7 @@ export function Navbar() {
     { name: "Beranda", href: "/" },
     { name: "Pendataan Mandiri", href: "/pendataan" },
     { name: "Cek Status Tiket", href: "/cek-tiket" },
-    { name: "Statistik Wilayah", href: "/#statistik" },
+    { name: "Wilayah 15 Desa", href: "/#subranting" },
     { name: "Portal Pengurus / Login", href: "/auth/login" },
   ];
 
