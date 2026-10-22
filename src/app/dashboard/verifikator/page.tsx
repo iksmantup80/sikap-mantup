@@ -46,16 +46,25 @@ export default function VerifikatorDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs">
-        <span className="text-xs font-bold text-amber-800 tracking-wider uppercase">
-          Panel Kerja Tim Verifikasi
-        </span>
-        <h1 className="text-2xl font-black text-stone-900 mt-1">
-          Antrean Pemeriksaan Dokumen KTA Fisik
-        </h1>
-        <p className="text-xs text-stone-500 mt-1">
-          Periksa keaslian nomor KTA fisik resmi pusat, keabsahan tingkatan, dan kelengkapan identitas warga.
-        </p>
+      <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <span className="text-xs font-bold text-amber-800 tracking-wider uppercase">
+            Panel Kerja Verifikasi & Admin Ranting
+          </span>
+          <h1 className="text-2xl font-black text-stone-900 mt-1">
+            Antrean Pemeriksaan Dokumen KTA Fisik
+          </h1>
+          <p className="text-xs text-stone-500 mt-1">
+            Periksa keaslian nomor KTA fisik resmi pusat, keabsahan tingkatan, dan kelengkapan identitas warga.
+          </p>
+        </div>
+
+        <a
+          href="/dashboard/admin"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-xs transition"
+        >
+          <span>Pusat Kendali Admin →</span>
+        </a>
       </div>
 
       {actionNotice && (

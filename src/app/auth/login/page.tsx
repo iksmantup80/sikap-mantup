@@ -35,10 +35,8 @@ export default function LoginPage() {
     e.preventDefault();
     if (!email) return;
 
-    if (email.includes("admin")) {
+    if (email.includes("admin") || email.includes("verif")) {
       handleLoginRole("admin_ranting", email);
-    } else if (email.includes("verif")) {
-      handleLoginRole("verifikator", email);
     } else if (email.includes("koord")) {
       handleLoginRole("koordinator_subranting", email);
     } else {
@@ -64,7 +62,7 @@ export default function LoginPage() {
               Portal SIKAP Mantup
             </h2>
             <p className="text-xs text-stone-300 mt-1">
-              Akses khusus Anggota, Koordinator Desa, Verifikator, & Pengurus Ranting
+              Akses khusus Admin/Verifikator Ranting, Koordinator Desa (15 Subranting), & Warga
             </p>
           </div>
 

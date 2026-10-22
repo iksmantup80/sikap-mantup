@@ -39,19 +39,13 @@ export default function DashboardLayout({
 
   const navItems = [
     {
-      name: "Kendali Admin Ranting",
+      name: "Pusat Kendali & Verifikasi Ranting",
       href: "/dashboard/admin",
-      roles: ["admin_ranting"],
+      roles: ["admin_ranting", "verifikator"],
       icon: "⚙️",
     },
     {
-      name: "Antrean Verifikator",
-      href: "/dashboard/verifikator",
-      roles: ["admin_ranting", "verifikator"],
-      icon: "🔍",
-    },
-    {
-      name: "Wilayah Koordinator",
+      name: "Wilayah Koordinator Desa",
       href: "/dashboard/koordinator",
       roles: ["admin_ranting", "koordinator_subranting"],
       icon: "📍",
@@ -93,14 +87,13 @@ export default function DashboardLayout({
             <div className="hidden sm:flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700 text-xs">
               <span className="text-stone-400">Peran Aktif:</span>
               <select
-                value={role}
+                value={role === "verifikator" ? "admin_ranting" : role}
                 onChange={(e) => handleRoleChange(e.target.value as UserRole)}
                 className="bg-stone-900 text-amber-300 font-bold rounded px-2 py-0.5 border border-stone-600 focus:outline-hidden text-xs"
               >
-                <option value="admin_ranting">Admin Ranting</option>
-                <option value="verifikator">Verifikator</option>
-                <option value="koordinator_subranting">Koord. Subranting</option>
-                <option value="anggota">Anggota</option>
+                <option value="admin_ranting">Admin & Verifikator Ranting</option>
+                <option value="koordinator_subranting">Koordinator Desa (15 Subranting)</option>
+                <option value="anggota">Anggota Warga</option>
               </select>
             </div>
 
