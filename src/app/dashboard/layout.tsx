@@ -17,10 +17,24 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const storedRole = sessionStorage.getItem("sikap_user_role") as UserRole;
-    const storedEmail = sessionStorage.getItem("sikap_user_email");
-    if (storedRole) setRole(storedRole);
+    const storedEmail = sessionStorage.getItem("sikap_user_email") || "";
     if (storedEmail) setEmail(storedEmail);
-  }, []);
+
+    // Otomatis aktifkan peran Admin Ranting jika akun adalah iksmantup80@gmail.com
+    if (
+      storedEmail.toLowerCase().includes("iksmantup") ||
+      storedEmail.toLowerCase().includes("admin") ||
+      storedEmail.toLowerCase().includes("verif")
+    ) {
+      if (!storedRole || storedRole === "anggota") {
+        setRole("admin_ranting");
+        sessionStorage.setItem("sikap_user_role", "admin_ranting");
+        return;
+      }
+    }
+
+    if (storedRole) setRole(storedRole);
+  }, [pathname]);
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
@@ -36,6 +50,12 @@ export default function DashboardLayout({
     sessionStorage.removeItem("sikap_user_email");
     router.push("/");
   };
+
+  const isAdminUser =
+    role === "admin_ranting" ||
+    role === "verifikator" ||
+    email.toLowerCase().includes("iksmantup") ||
+    email.toLowerCase().includes("admin");
 
   const navItems = [
     {
@@ -57,6 +77,10 @@ export default function DashboardLayout({
       icon: "👤",
     },
   ];
+
+  const visibleNavItems = navItems.filter((item) =>
+    isAdminUser ? true : item.roles.includes(role)
+  );
 
   return (
     <div className="min-h-screen bg-stone-100 flex flex-col font-sans">
@@ -83,17 +107,17 @@ export default function DashboardLayout({
           </div>
 
           {/* Role Switcher & User Profile Pill */}
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700 text-xs">
-              <span className="text-stone-400">Peran Aktif:</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-stone-800 px-2 sm:px-3 py-1.5 rounded-lg border border-stone-700 text-xs">
+              <span className="text-stone-400 hidden xs:inline">Peran:</span>
               <select
                 value={role === "verifikator" ? "admin_ranting" : role}
                 onChange={(e) => handleRoleChange(e.target.value as UserRole)}
-                className="bg-stone-900 text-amber-300 font-bold rounded px-2 py-0.5 border border-stone-600 focus:outline-hidden text-xs"
+                className="bg-stone-900 text-amber-300 font-bold rounded px-1.5 py-0.5 border border-stone-600 focus:outline-hidden text-xs cursor-pointer"
               >
-                <option value="admin_ranting">Admin & Verifikator Ranting</option>
-                <option value="koordinator_subranting">Koordinator Desa (15 Subranting)</option>
-                <option value="anggota">Anggota Warga</option>
+                <option value="admin_ranting">👑 Admin Ranting</option>
+                <option value="koordinator_subranting">📍 Koordinator Desa</option>
+                <option value="anggota">👤 Anggota Warga</option>
               </select>
             </div>
 
@@ -101,14 +125,14 @@ export default function DashboardLayout({
               <span className="text-xs font-semibold text-stone-200 block truncate max-w-[150px]">
                 {email}
               </span>
-              <span className="text-[10px] text-emerald-400 font-mono">
-                Akun Terverifikasi
+              <span className="text-[10px] text-emerald-400 font-mono block">
+                {isAdminUser ? "👑 Admin Ranting" : "Akun Terverifikasi"}
               </span>
             </div>
 
             <button
               onClick={handleLogout}
-              className="text-xs bg-red-800/80 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg border border-red-700 transition"
+              className="text-xs bg-red-800/80 hover:bg-red-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-red-700 transition"
             >
               Keluar
             </button>
@@ -118,10 +142,8 @@ export default function DashboardLayout({
         {/* Dashboard Subnav */}
         <div className="bg-stone-850 border-t border-stone-800 px-4 sm:px-6 lg:px-8 overflow-x-auto">
           <div className="max-w-7xl mx-auto flex items-center space-x-2 py-2">
-            {navItems
-              .filter((item) => item.roles.includes(role))
-              .map((item) => {
-                const isActive = pathname === item.href;
+            {visibleNavItems.map((item) => {
+              const isActive = pathname === item.href;
                 return (
                   <Link
                     key={item.href}

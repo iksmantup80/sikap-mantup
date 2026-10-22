@@ -5,14 +5,44 @@ import Link from "next/link";
 import { AnggotaService } from "@/lib/services/anggotaService";
 import { KtaCard } from "@/components/cards/KtaCard";
 import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge } from "@/components/ui/Badge";
+import { Anggota } from "@/types/database";
 
 export default function AnggotaDashboardPage() {
-  const anggotaList = AnggotaService.getAll();
-  const anggota = anggotaList[0];
+  const [dataList, setDataList] = useState<Anggota[]>(() => AnggotaService.getAll());
+  const [userRole, setUserRole] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [alamatUpdate, setAlamatUpdate] = useState(anggota?.alamat_detail || "");
-  const [waUpdate, setWaUpdate] = useState(anggota?.nomor_wa || "");
+  const [alamatUpdate, setAlamatUpdate] = useState("");
+  const [waUpdate, setWaUpdate] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const r = sessionStorage.getItem("sikap_user_role") || "";
+      const e = sessionStorage.getItem("sikap_user_email") || "";
+      setUserRole(r);
+      setUserEmail(e);
+    }
+
+    AnggotaService.getAllAsync().then((list) => {
+      setDataList(list);
+    });
+  }, []);
+
+  const anggota = dataList[0];
+
+  React.useEffect(() => {
+    if (anggota) {
+      setAlamatUpdate(anggota.alamat_detail || "");
+      setWaUpdate(anggota.nomor_wa || "");
+    }
+  }, [anggota]);
+
+  const isAdmin =
+    userRole === "admin_ranting" ||
+    userRole === "verifikator" ||
+    userEmail.toLowerCase().includes("iksmantup") ||
+    userEmail.toLowerCase().includes("admin");
 
   if (!anggota) {
     return (
@@ -47,14 +77,40 @@ export default function AnggotaDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Admin Fast-Switch Banner */}
+      {isAdmin && (
+        <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-stone-950 p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border border-amber-300 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">👑</span>
+            <div>
+              <strong className="block text-sm font-black text-stone-950">
+                Jien Shoo, Administrator Ranting ({userEmail || "iksmantup80@gmail.com"})!
+              </strong>
+              <span className="text-xs text-stone-900 leading-tight block">
+                Anda sedang melihat arsip kartu identitas pribadi Anda. Klik tombol di sebelah kanan untuk langsung masuk ke Ruang Kendali Admin & memeriksa antrean verifikasi KTA warga.
+              </span>
+            </div>
+          </div>
+          <Link
+            href="/dashboard/admin"
+            className="px-4 py-2.5 bg-stone-900 hover:bg-stone-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0 shadow-md"
+          >
+            <span>Buka Pusat Kendali Admin →</span>
+          </Link>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="text-xs font-bold text-emerald-700 tracking-wider uppercase">
-            Portal Warga Mandiri
+          <span className="text-[11px] font-bold text-amber-800 tracking-wider uppercase bg-amber-100 px-2.5 py-0.5 rounded-full inline-block mb-1 border border-amber-200">
+            Salam Persaudaraan IKSPI Kera Sakti
           </span>
-          <h1 className="text-2xl font-black text-stone-900 mt-1">
-            Selamat Datang, {anggota.nama_lengkap}
+          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 mt-1 flex items-center gap-2 flex-wrap">
+            <span>Jien Shoo, {anggota.nama_lengkap}!</span>
+            <span className="text-xs font-bold text-amber-900 bg-amber-100/90 px-2.5 py-1 rounded-lg border border-amber-300">
+              ✋ Jien Sho
+            </span>
           </h1>
           <p className="text-xs text-stone-500 mt-1">
             Warga IKSPI Kera Sakti • Ranting Mantup, Kec. Mantup, Lamongan
