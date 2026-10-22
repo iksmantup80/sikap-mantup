@@ -61,7 +61,9 @@ export interface Profile {
 export interface Anggota {
   id: string;
   kategori_anggota?: KategoriAnggota; // 'warga' atau 'siswa'
-  nomor_kta?: string | null; // Nomor KTA resmi fisik dari Pusat Madiun (khusus Warga)
+  nomor_kta?: string | null; // No. Induk resmi fisik dari KTA Pusat Madiun (khusus Warga)
+  angkatan?: string | number | null; // Angkatan ke- (tercetak di KTA Pusat, misal 118, 120, 125)
+  tanggal_pengesahan?: string | null; // Tanggal pengesahan (tercetak di KTA Pusat)
   nama_lengkap: string;
   nik?: string | null;
   tempat_lahir: string;

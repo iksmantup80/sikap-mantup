@@ -124,6 +124,8 @@ export const AnggotaService = {
           .from("anggota")
           .insert({
             nomor_kta: input.nomor_kta ? input.nomor_kta.trim() : null,
+            angkatan: input.angkatan ? String(input.angkatan).trim() : null,
+            tanggal_pengesahan: input.tanggal_pengesahan || null,
             kategori_anggota: input.kategori_anggota || "warga",
             nama_lengkap: input.nama_lengkap,
             nik: input.nik || null,
@@ -165,6 +167,8 @@ export const AnggotaService = {
     const newAnggota: Anggota = {
       id: newId,
       nomor_kta: input.nomor_kta ? input.nomor_kta.trim() : null,
+      angkatan: input.angkatan ? String(input.angkatan).trim() : null,
+      tanggal_pengesahan: input.tanggal_pengesahan || null,
       kategori_anggota: input.kategori_anggota || "warga",
       nama_lengkap: input.nama_lengkap,
       nik: input.nik || null,

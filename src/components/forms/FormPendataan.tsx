@@ -42,6 +42,8 @@ export function FormPendataan({
       nama_lengkap: "",
       nik: "",
       nomor_kta: "",
+      angkatan: "",
+      tanggal_pengesahan: "",
       tempat_lahir: "",
       tanggal_lahir: "1998-01-01",
       jenis_kelamin: "L",
@@ -117,13 +119,11 @@ export function FormPendataan({
         if (!values.tingkatan) {
           errs.tingkatan = "Pilih tingkatan warga";
         }
-        const yr = Number(values.tahun_pengesahan);
-        const curYr = new Date().getFullYear();
-        if (!yr || yr < 1980 || yr > curYr) {
-          errs.tahun_pengesahan = `Tahun pengesahan harus antara 1980 dan ${curYr}`;
+        if (!values.angkatan || !String(values.angkatan).trim()) {
+          errs.angkatan = "Nomor angkatan wajib diisi sesuai KTA Pusat (contoh: 118)";
         }
-        if (!values.tempat_pengesahan || values.tempat_pengesahan.trim().length < 2) {
-          errs.tempat_pengesahan = "Tempat pengesahan wajib diisi (contoh: Padepokan Pusat Madiun)";
+        if (!values.tanggal_pengesahan || !values.tanggal_pengesahan.trim()) {
+          errs.tanggal_pengesahan = "Tanggal pengesahan wajib diisi sesuai KTA Pusat";
         }
       } else {
         // Siswa
@@ -199,6 +199,12 @@ export function FormPendataan({
 
     try {
       const data = getValues();
+      let derivedYear = Number(data.tahun_pengesahan) || 2018;
+      if (data.tanggal_pengesahan) {
+        const parsedYear = new Date(data.tanggal_pengesahan).getFullYear();
+        if (!isNaN(parsedYear)) derivedYear = parsedYear;
+      }
+
       const cleanData: FormAnggotaInput = {
         ...data,
         nama_lengkap: data.nama_lengkap.trim(),
@@ -210,6 +216,9 @@ export function FormPendataan({
         tempat_latihan: data.tempat_latihan ? data.tempat_latihan.trim() : "",
         nama_pelatih: data.nama_pelatih ? data.nama_pelatih.trim() : "",
         nomor_kta: data.nomor_kta ? data.nomor_kta.trim() : "",
+        angkatan: data.angkatan ? String(data.angkatan).trim() : "",
+        tanggal_pengesahan: data.tanggal_pengesahan ? String(data.tanggal_pengesahan).trim() : "",
+        tahun_pengesahan: derivedYear,
       };
 
       const res = await AnggotaService.submitPengajuanMandiri(cleanData);
@@ -702,30 +711,93 @@ export function FormPendataan({
             {/* FORM KHUSUS WARGA */}
             {kategoriAnggota === "warga" && (
               <div className="space-y-4 pt-2">
-                <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-800">
-                  <strong>Aturan Pencatatan KTA:</strong> Catat nomor KTA persis sebagaimana tercetak pada fisik kartu resmi yang diterbitkan Pusat Madiun. Sistem ranting tidak akan mengubah nomor ataupun mencetak KTA pengganti.
+                <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-900 leading-relaxed">
+                  <strong>Pencatatan Data KTA Pusat:</strong> Masukkan data persis sebagaimana tercetak pada fisik kartu resmi KTA Pusat Madiun Anda (<strong>No. Induk</strong>, <strong>Angkatan</strong>, dan <strong>Tanggal Pengesahan</strong>).
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                    Nomor KTA Pusat (Tercetak di Kartu Fisik)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: 1998.05.0123 (Kosongkan bila belum terbit)"
-                    {...register("nomor_kta", {
-                      onChange: () => clearFieldError("nomor_kta"),
-                    })}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 font-mono"
-                  />
-                  {fieldErrors.nomor_kta && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
-                      <span>⚠️</span> {fieldErrors.nomor_kta}
-                    </p>
-                  )}
-                </div>
-
+                {/* Baris 1: No. Induk & Angkatan */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      No. Induk (Tercetak di KTA Pusat)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: 12345/PST/120 atau nomor di KTA"
+                      {...register("nomor_kta", {
+                        onChange: () => clearFieldError("nomor_kta"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 font-mono transition ${
+                        fieldErrors.nomor_kta
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      }`}
+                    />
+                    {fieldErrors.nomor_kta ? (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.nomor_kta}
+                      </p>
+                    ) : (
+                      <span className="text-[11px] text-gray-500">
+                        Kosongkan bila kartu KTA fisik masih dalam proses terbit.
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Angkatan Ke- (Tercetak di KTA Pusat) *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: 118 (atau 120, 125, dst.)"
+                      {...register("angkatan", {
+                        onChange: () => clearFieldError("angkatan"),
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 font-semibold transition ${
+                        fieldErrors.angkatan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      }`}
+                    />
+                    {fieldErrors.angkatan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.angkatan}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Baris 2: Tanggal Pengesahan & Tingkatan */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                      Tanggal Pengesahan (Tercetak di KTA Pusat) *
+                    </label>
+                    <input
+                      type="date"
+                      {...register("tanggal_pengesahan", {
+                        onChange: (e) => {
+                          clearFieldError("tanggal_pengesahan");
+                          if (e.target.value) {
+                            const y = new Date(e.target.value).getFullYear();
+                            if (!isNaN(y)) setValue("tahun_pengesahan", y);
+                          }
+                        },
+                      })}
+                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
+                        fieldErrors.tanggal_pengesahan
+                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
+                          : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      }`}
+                    />
+                    {fieldErrors.tanggal_pengesahan && (
+                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
+                        <span>⚠️</span> {fieldErrors.tanggal_pengesahan}
+                      </p>
+                    )}
+                  </div>
+
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
                       Tingkatan Warga *
@@ -751,53 +823,6 @@ export function FormPendataan({
                       </p>
                     )}
                   </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                      Tahun Pengesahan Warga *
-                    </label>
-                    <input
-                      type="number"
-                      min={1980}
-                      max={new Date().getFullYear()}
-                      {...register("tahun_pengesahan", {
-                        onChange: () => clearFieldError("tahun_pengesahan"),
-                      })}
-                      className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                        fieldErrors.tahun_pengesahan
-                          ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
-                          : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                      }`}
-                    />
-                    {fieldErrors.tahun_pengesahan && (
-                      <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
-                        <span>⚠️</span> {fieldErrors.tahun_pengesahan}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                    Tempat Pengesahan *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Padepokan Pusat Madiun / Cabang Lamongan"
-                    {...register("tempat_pengesahan", {
-                      onChange: () => clearFieldError("tempat_pengesahan"),
-                    })}
-                    className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 transition ${
-                      fieldErrors.tempat_pengesahan
-                        ? "border-rose-500 ring-2 ring-rose-200 bg-rose-50/40"
-                        : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    }`}
-                  />
-                  {fieldErrors.tempat_pengesahan && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1.5">
-                      <span>⚠️</span> {fieldErrors.tempat_pengesahan}
-                    </p>
-                  )}
                 </div>
               </div>
             )}
@@ -955,19 +980,47 @@ export function FormPendataan({
                 </div>
 
                 {formValues.kategori_anggota === "warga" ? (
-                  <div>
-                    <span className="text-stone-400 block">Nomor KTA:</span>
-                    <strong className="text-amber-800 font-mono">
-                      {formValues.nomor_kta || "(Belum Tercatat)"}
-                    </strong>
-                  </div>
+                  <>
+                    <div>
+                      <span className="text-stone-400 block">No. Induk (KTA):</span>
+                      <strong className="text-amber-800 font-mono">
+                        {formValues.nomor_kta || "(Belum Tercatat / Proses Terbit)"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block">Angkatan Ke-:</span>
+                      <strong className="text-amber-900 font-bold">
+                        {formValues.angkatan ? `Angkatan ${formValues.angkatan}` : "-"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block">Tanggal Pengesahan:</span>
+                      <strong className="text-stone-800">
+                        {formValues.tanggal_pengesahan
+                          ? new Date(formValues.tanggal_pengesahan).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })
+                          : "-"}
+                      </strong>
+                    </div>
+                  </>
                 ) : (
-                  <div>
-                    <span className="text-stone-400 block">Tempat Latihan:</span>
-                    <strong className="text-indigo-900">
-                      {formValues.tempat_latihan || "Subranting Desa"}
-                    </strong>
-                  </div>
+                  <>
+                    <div>
+                      <span className="text-stone-400 block">Tempat Latihan:</span>
+                      <strong className="text-indigo-900">
+                        {formValues.tempat_latihan || "Subranting Desa"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block">Tahun Mulai:</span>
+                      <strong className="text-indigo-900">
+                        {formValues.tahun_pengesahan}
+                      </strong>
+                    </div>
+                  </>
                 )}
 
                 <div>
@@ -982,8 +1035,8 @@ export function FormPendataan({
                 </div>
                 <div>
                   <span className="text-stone-400 block">Tingkatan / Sabuk:</span>
-                  <span>
-                    {formValues.tingkatan} ({formValues.tahun_pengesahan})
+                  <span className="font-semibold text-gray-900">
+                    {formValues.tingkatan}
                   </span>
                 </div>
                 <div>

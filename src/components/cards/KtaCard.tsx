@@ -103,7 +103,7 @@ export function KtaCard({
 
           <div>
             <span className="text-stone-400 text-[10px] block uppercase font-medium">
-              {isSiswa ? "Tempat Latihan / Diklat" : "Nomor KTA Pusat (Asli)"}
+              {isSiswa ? "Tempat Latihan Subranting" : "No. Induk (KTA Pusat)"}
             </span>
             <span
               className={`font-bold text-xs ${
@@ -118,12 +118,29 @@ export function KtaCard({
 
           <div className="flex items-center gap-2">
             <TingkatanBadge tingkatan={anggota.tingkatan} />
-            <span className="text-[11px] text-stone-300">
+            <span className="text-[11px] font-semibold text-amber-200">
               {isSiswa
-                ? `Target Pengesahan ${anggota.tahun_pengesahan}`
-                : `Angkatan ${anggota.tahun_pengesahan}`}
+                ? `Mulai/Target: ${anggota.tahun_pengesahan}`
+                : `Angkatan ${anggota.angkatan || anggota.tahun_pengesahan}`}
             </span>
           </div>
+
+          {!isSiswa && (
+            <div>
+              <span className="text-stone-400 text-[10px] block uppercase font-medium">
+                Tanggal Pengesahan
+              </span>
+              <span className="text-stone-200 font-medium">
+                {anggota.tanggal_pengesahan
+                  ? new Date(anggota.tanggal_pengesahan).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : String(anggota.tahun_pengesahan)}
+              </span>
+            </div>
+          )}
 
           <div>
             <span className="text-stone-400 text-[10px] block uppercase font-medium">

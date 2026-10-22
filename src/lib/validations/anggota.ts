@@ -18,6 +18,14 @@ export const formAnggotaSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val ? val.trim() : "")),
+  angkatan: z
+    .string()
+    .optional()
+    .transform((val) => (val ? val.trim() : "")),
+  tanggal_pengesahan: z
+    .string()
+    .optional()
+    .transform((val) => (val ? val.trim() : "")),
   tempat_lahir: z
     .string()
     .trim()

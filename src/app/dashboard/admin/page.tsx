@@ -497,9 +497,16 @@ export default function AdminDashboardPage() {
                   {/* Identity Grid */}
                   <div className="grid grid-cols-2 gap-3 text-xs bg-stone-50 p-4 rounded-xl border border-stone-200">
                     <div>
-                      <span className="text-stone-400 block">Nomor KTA Pusat (Fisik):</span>
+                      <span className="text-stone-400 block">No. Induk (KTA Pusat):</span>
                       <span className="font-mono font-bold text-amber-900 text-sm">
-                        {selectedVerifItem.nomor_kta || "(Belum Mengisi KTA)"}
+                        {selectedVerifItem.nomor_kta || "(Belum Mengisi No. Induk)"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block">Angkatan & Pengesahan:</span>
+                      <span className="font-semibold text-stone-800">
+                        {selectedVerifItem.angkatan ? `Angkatan ${selectedVerifItem.angkatan}` : `Tahun ${selectedVerifItem.tahun_pengesahan}`}
+                        {selectedVerifItem.tanggal_pengesahan ? ` • ${selectedVerifItem.tanggal_pengesahan}` : ""}
                       </span>
                     </div>
                     <div>
@@ -515,10 +522,6 @@ export default function AdminDashboardPage() {
                     <div>
                       <span className="text-stone-400 block">Kontak WhatsApp:</span>
                       <span className="font-mono text-stone-800">{selectedVerifItem.nomor_wa}</span>
-                    </div>
-                    <div>
-                      <span className="text-stone-400 block">Pengesahan / Angkatan:</span>
-                      <span>Tahun {selectedVerifItem.tahun_pengesahan} • {selectedVerifItem.tempat_pengesahan || "Pusat Madiun"}</span>
                     </div>
                     <div>
                       <span className="text-stone-400 block">Alamat Domisili:</span>
@@ -767,7 +770,7 @@ export default function AdminDashboardPage() {
                     selectedAnggota.tingkatan?.startsWith("Siswa") ||
                     selectedAnggota.tingkatan === "Calon Warga"
                       ? "Tempat Latihan:"
-                      : "Nomor KTA Pusat:"}
+                      : "No. Induk (KTA Pusat):"}
                   </span>
                   <span className="font-mono font-bold text-amber-900">
                     {selectedAnggota.kategori_anggota === "siswa" ||
@@ -775,6 +778,13 @@ export default function AdminDashboardPage() {
                     selectedAnggota.tingkatan === "Calon Warga"
                       ? selectedAnggota.tempat_latihan || "Subranting Desa"
                       : selectedAnggota.nomor_kta || "Belum ada"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-stone-400 block">Angkatan & Pengesahan:</span>
+                  <span className="font-semibold text-stone-900">
+                    {selectedAnggota.angkatan ? `Angkatan ${selectedAnggota.angkatan}` : `Tahun ${selectedAnggota.tahun_pengesahan}`}
+                    {selectedAnggota.tanggal_pengesahan ? ` • ${selectedAnggota.tanggal_pengesahan}` : ""}
                   </span>
                 </div>
                 <div>
