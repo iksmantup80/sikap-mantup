@@ -8,10 +8,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-red-700 flex items-center justify-center text-white font-black text-sm">
-                S
-              </div>
+            <div className="flex items-center gap-3 mb-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-ikspi-mantup.png"
+                alt="Logo IKSPI Kera Sakti Mantup"
+                className="w-9 h-9 object-contain"
+              />
               <span className="text-white font-extrabold text-lg tracking-tight">
                 SIKAP MANTUP
               </span>

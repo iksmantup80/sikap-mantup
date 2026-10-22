@@ -71,9 +71,12 @@ export default function DashboardLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-red-700 flex items-center justify-center font-black text-white text-base">
-                S
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-ikspi-mantup.png"
+                alt="Logo IKSPI Kera Sakti Mantup"
+                className="w-9 h-9 object-contain"
+              />
               <div>
                 <span className="font-extrabold text-base tracking-tight text-white block">
                   SIKAP MANTUP

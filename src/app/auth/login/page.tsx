@@ -54,9 +54,12 @@ export default function LoginPage() {
         <div className="max-w-md w-full bg-white rounded-2xl border border-stone-200 shadow-xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-stone-900 to-amber-950 p-6 text-white text-center">
-            <div className="w-12 h-12 bg-red-700 rounded-xl flex items-center justify-center font-black text-xl mx-auto mb-2 shadow-md">
-              S
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-ikspi-mantup.png"
+              alt="Logo IKSPI Kera Sakti Mantup"
+              className="w-14 h-14 object-contain mx-auto mb-2 drop-shadow-md"
+            />
             <h2 className="text-xl font-black text-amber-100">
               Portal SIKAP Mantup
             </h2>

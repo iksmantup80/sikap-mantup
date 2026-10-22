@@ -26,9 +26,12 @@ export function KtaCard({
 
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-amber-500/30 pb-3 mb-4">
-        <div className="w-11 h-11 rounded-lg bg-gradient-to-tr from-red-600 to-amber-600 flex items-center justify-center font-black text-white text-lg shadow-inner">
-          IK
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-ikspi-mantup.png"
+          alt="Logo IKSPI Kera Sakti Mantup"
+          className="w-11 h-11 object-contain drop-shadow"
+        />
         <div>
           <h4 className="font-extrabold text-base tracking-tight text-amber-100 flex items-center gap-2">
             IKSPI KERA SAKTI

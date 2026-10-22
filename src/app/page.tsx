@@ -82,9 +82,12 @@ export default function HomePage() {
             <div className="lg:col-span-5 flex justify-center">
               <div className="w-full max-w-sm bg-stone-900/90 border border-amber-500/40 rounded-2xl p-6 text-white shadow-2xl backdrop-blur-xs">
                 <div className="flex items-center gap-3 border-b border-stone-800 pb-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-amber-600 flex items-center justify-center font-black text-white text-lg shadow-inner">
-                    IK
-                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/logo-ikspi-mantup.png"
+                    alt="Logo IKSPI Kera Sakti Mantup"
+                    className="w-10 h-10 object-contain drop-shadow"
+                  />
                   <div>
                     <h3 className="font-bold text-sm text-amber-100">Tahapan Pendataan Warga</h3>
                     <p className="text-[11px] text-stone-400">Ranting Mantup, Kab. Lamongan</p>

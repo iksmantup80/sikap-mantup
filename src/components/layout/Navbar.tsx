@@ -30,9 +30,12 @@ export function Navbar() {
         <div className="flex justify-between h-16 items-center">
           {/* Logo & Identity */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 via-red-600 to-amber-900 flex items-center justify-center text-white font-black text-xl shadow-md group-hover:scale-105 transition-transform">
-              S
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-ikspi-mantup.png"
+              alt="Logo IKSPI Kera Sakti Mantup"
+              className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-gray-900 text-lg tracking-tight">
