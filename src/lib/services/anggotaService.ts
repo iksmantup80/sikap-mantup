@@ -613,4 +613,54 @@ export const AnggotaService = {
       sebaranDesa,
     };
   },
+
+  // Perbarui data profil & lampiran foto KTA oleh anggota
+  updateAnggota: async (
+    id: string,
+    updates: Partial<Anggota>
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const supabase = createClient();
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (supabaseUrl && !supabaseUrl.includes("example.supabase.co")) {
+        const { error } = await supabase
+          .from("anggota")
+          .update({
+            ...updates,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", id);
+        if (error) {
+          console.error("Gagal update Supabase anggota:", error);
+        }
+      }
+    } catch (e) {
+      console.warn("Gagal update cloud, fallback to local:", e);
+    }
+
+    const idx = localAnggotaList.findIndex((a) => a.id === id);
+    if (idx !== -1) {
+      localAnggotaList[idx] = {
+        ...localAnggotaList[idx],
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+    }
+
+    const pIdx = localPengajuanList.findIndex((p) => p.anggota_id === id);
+    if (pIdx !== -1 && localPengajuanList[pIdx].anggota) {
+      localPengajuanList[pIdx] = {
+        ...localPengajuanList[pIdx],
+        anggota: {
+          ...localPengajuanList[pIdx].anggota!,
+          ...updates,
+          updated_at: new Date().toISOString(),
+        },
+        updated_at: new Date().toISOString(),
+      };
+    }
+
+    saveToLocalStorage();
+    return { success: true, message: "Profil berhasil diperbarui." };
+  },
 };

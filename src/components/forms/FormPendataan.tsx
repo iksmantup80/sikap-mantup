@@ -57,9 +57,65 @@ export function FormPendataan({
       tempat_latihan: "",
       nama_pelatih: "",
       status_keaktifan: "aktif",
+      foto_kta_url: "",
       is_demo: false,
     },
   });
+
+  const [fotoKtaPreview, setFotoKtaPreview] = useState<string>("");
+
+  const handleFotoKtaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 15 * 1024 * 1024) {
+      alert("Ukuran file foto terlalu besar. Maksimal 15 MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 900;
+        const MAX_HEIGHT = 900;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.72);
+          setFotoKtaPreview(compressedDataUrl);
+          setValue("foto_kta_url", compressedDataUrl);
+        }
+      };
+      if (typeof event.target?.result === "string") {
+        img.src = event.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveFotoKta = () => {
+    setFotoKtaPreview("");
+    setValue("foto_kta_url", "");
+  };
 
   const formValues = watch();
   const kategoriAnggota = watch("kategori_anggota");
@@ -824,6 +880,62 @@ export function FormPendataan({
                     )}
                   </div>
                 </div>
+
+                {/* Upload Foto Fisik KTA Pusat */}
+                <div className="pt-2">
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                    Lampiran Foto Fisik KTA Pusat (Opsional / Disarankan)
+                  </label>
+                  <p className="text-[11px] text-gray-500 mb-2.5">
+                    Unggah atau ambil foto kartu fisik KTA resmi Pusat Madiun Anda. Bukti foto fisik ini akan sangat mempercepat proses persetujuan verifikator ranting.
+                  </p>
+
+                  {fotoKtaPreview ? (
+                    <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-3 flex flex-col sm:flex-row items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={fotoKtaPreview}
+                        alt="Pratinjau KTA Fisik"
+                        className="w-32 h-20 object-cover rounded-lg border border-amber-300 shadow-xs shrink-0"
+                      />
+                      <div className="flex-1 text-xs text-center sm:text-left">
+                        <span className="text-emerald-700 font-bold flex items-center justify-center sm:justify-start gap-1">
+                          <span>✓</span> Foto Fisik KTA Berhasil Dipilih
+                        </span>
+                        <span className="text-gray-500 block text-[11px] mt-0.5">
+                          Foto telah dikompresi otomatis dan siap dikirim bersama formulir.
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFotoKta}
+                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition shrink-0"
+                      >
+                        Hapus / Ganti
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-gray-300 hover:border-amber-500 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-amber-50/40 transition">
+                      <svg className="w-8 h-8 text-amber-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="text-xs font-bold text-gray-800">
+                        Ambil Foto atau Pilih Gambar Fisik KTA
+                      </span>
+                      <span className="text-[11px] text-gray-400 mt-0.5">
+                        Bisa langsung lewat kamera HP atau pilih file dari galeri (JPG, PNG)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleFotoKtaChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
               </div>
             )}
 
@@ -1005,6 +1117,12 @@ export function FormPendataan({
                           : "-"}
                       </strong>
                     </div>
+                    <div>
+                      <span className="text-stone-400 block">Bukti Foto KTA:</span>
+                      <strong className={formValues.foto_kta_url ? "text-emerald-700 font-bold" : "text-stone-400 font-normal"}>
+                        {formValues.foto_kta_url ? "✓ Terlampir" : "(Belum Dilampirkan)"}
+                      </strong>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -1044,6 +1162,21 @@ export function FormPendataan({
                   <span className="capitalize font-semibold text-emerald-800">{formValues.status_keaktifan}</span>
                 </div>
               </div>
+
+              {formValues.foto_kta_url && (
+                <div className="mt-3 p-3 bg-white rounded-xl border border-stone-200 flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={formValues.foto_kta_url}
+                    alt="Foto Fisik KTA Terlampir"
+                    className="w-20 h-14 object-cover rounded-lg border border-amber-300 shadow-xs shrink-0"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-stone-800 block">Lampiran Foto Fisik KTA</span>
+                    <span className="text-emerald-700 text-[11px] block">Foto siap dikirim untuk verifikasi Ranting Mantup</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1">
