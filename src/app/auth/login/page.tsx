@@ -105,7 +105,7 @@ export default function LoginPage() {
               Portal Masuk SIKAP Mantup
             </h2>
             <p className="text-xs text-stone-300 mt-1 max-w-xs mx-auto">
-              Sistem Informasi Keanggotaan & Administrasi Persaudaraan IKSPI Kera Sakti Ranting Mantup
+              Sistem Informasi Keanggotaan & Administrasi Perguruan IKSPI Kera Sakti Ranting Mantup
             </p>
           </div>
 

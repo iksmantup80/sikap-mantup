@@ -20,11 +20,11 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-stone-400 mb-4 max-w-md">
-              Sistem Informasi Keanggotaan dan Administrasi Persaudaraan untuk internal
+              Sistem Informasi Keanggotaan dan Administrasi Perguruan untuk internal
               IKSPI Kera Sakti Ranting Mantup, Kecamatan Mantup, Kabupaten Lamongan, Jawa Timur.
             </p>
             <div className="bg-stone-800/80 p-3 rounded-lg border border-stone-700 text-xs text-stone-300">
-              <strong className="text-amber-400">Catatan Privasi & Keabsahan:</strong> Data anggota dilindungi sesuai etika persaudaraan dan peraturan data pribadi. Tidak ada nomor KTA buatan mandiri; seluruh pencatatan merujuk pada KTA fisik resmi dari Pusat.
+              <strong className="text-amber-400">Catatan Privasi & Keabsahan:</strong> Data anggota dilindungi sesuai etika perguruan dan peraturan perlindungan data pribadi. Tidak ada nomor KTA buatan mandiri; seluruh pencatatan merujuk pada KTA fisik resmi dari Pusat.
             </div>
           </div>
 

@@ -176,7 +176,7 @@ export default function AnggotaDashboardPage() {
       <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <span className="text-[11px] font-bold text-amber-800 tracking-wider uppercase bg-amber-100 px-2.5 py-0.5 rounded-full inline-block mb-1 border border-amber-200">
-            Salam Persaudaraan IKSPI Kera Sakti
+            Salam Kekeluargaan IKSPI Kera Sakti
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-stone-900 mt-1 flex items-center gap-2 flex-wrap">
             <span>Jien Shoo, {anggota.nama_lengkap}!</span>

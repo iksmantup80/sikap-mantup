@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | SIKAP Mantup",
   },
   description:
-    "Sistem Informasi Keanggotaan dan Administrasi Persaudaraan internal IKSPI Kera Sakti Ranting Mantup, Kec. Mantup, Kab. Lamongan, Jawa Timur.",
+    "Sistem Informasi Keanggotaan dan Administrasi Perguruan internal IKSPI Kera Sakti Ranting Mantup, Kec. Mantup, Kab. Lamongan, Jawa Timur.",
   keywords: [
     "IKSPI",
     "Kera Sakti",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SIKAP Mantup — IKSPI Kera Sakti Ranting Mantup",
     description:
-      "Sistem Informasi Keanggotaan dan Administrasi Persaudaraan internal IKSPI Kera Sakti Ranting Mantup, Kab. Lamongan.",
+      "Sistem Informasi Keanggotaan dan Administrasi Perguruan internal IKSPI Kera Sakti Ranting Mantup, Kab. Lamongan.",
     url: "https://ikspimantup.my.id",
     siteName: "SIKAP Mantup",
     locale: "id_ID",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SIKAP Mantup — IKSPI Kera Sakti Ranting Mantup",
     description:
-      "Sistem Informasi Keanggotaan dan Administrasi Persaudaraan internal IKSPI Kera Sakti Ranting Mantup, Lamongan.",
+      "Sistem Informasi Keanggotaan dan Administrasi Perguruan internal IKSPI Kera Sakti Ranting Mantup, Lamongan.",
   },
   alternates: {
     canonical: "https://ikspimantup.my.id",

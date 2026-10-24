@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "SIKAP Mantup — IKSPI Kera Sakti",
     short_name: "SIKAP Mantup",
     description:
-      "Sistem Informasi Keanggotaan dan Administrasi Persaudaraan IKSPI Kera Sakti Ranting Mantup, Kec. Mantup, Kab. Lamongan",
+      "Sistem Informasi Keanggotaan dan Administrasi Perguruan IKSPI Kera Sakti Ranting Mantup, Kec. Mantup, Kab. Lamongan",
     start_url: "/",
     display: "standalone",
     background_color: "#1c1917",

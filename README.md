@@ -1,5 +1,5 @@
 # SIKAP MANTUP
-### Sistem Informasi Keanggotaan dan Administrasi Persaudaraan
+### Sistem Informasi Keanggotaan dan Administrasi Perguruan
 **IKSPI Kera Sakti Ranting Mantup, Kecamatan Mantup, Kabupaten Lamongan, Jawa Timur**
 
 ---

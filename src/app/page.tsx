@@ -34,7 +34,7 @@ export default function HomePage() {
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
                 Tertib Administrasi,{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500">
-                  Guyub Persaudaraan
+                  Guyub Kekeluargaan
                 </span>
               </h1>
 
@@ -213,7 +213,7 @@ export default function HomePage() {
               <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <div>
                   <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-500/10 border border-amber-400/30 px-3 py-1 rounded-full inline-block mb-3">
-                    Salam Persaudaraan ✋ Jien Sho
+                    Salam Kekeluargaan ✋ Jien Sho
                   </span>
                   <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
                     &quot;Jien Shoo, Selamat Datang Saudaraku Warga &amp; Siswa!&quot;
@@ -228,7 +228,7 @@ export default function HomePage() {
                     Platform ini dihadirkan untuk mendata, memverifikasi keabsahan nomor KTA fisik resmi Padepokan Pusat Madiun, serta merangkul seluruh saudara seperguruan yang tersebar di <strong>15 Subranting Desa</strong> dan titik-titik latihan <strong>Rayon</strong> se-Kecamatan Mantup.
                   </p>
                   <p className="text-amber-200 font-medium italic border-l-2 border-amber-500/50 pl-3">
-                    &quot;Empat Penjuru Kita Cari Saudara, Tapi Bila Musuh Pantang Tunduk Kepala. Guyub rukun, bersatu, dan menjaga marwah perguruan.&quot;
+                    &quot;Empat Penjuru Kita Cari Saudara, Tapi Bila Musuh Pantang Tunduk Kepala. Guyub rukun, bersatu, dan menjaga marwah perguruan dalam ikatan kekeluargaan.&quot;
                   </p>
                 </div>
 
@@ -353,7 +353,7 @@ export default function HomePage() {
                   Privasi & Kerahasiaan Data Anggota Terlindungi
                 </strong>
                 <p className="text-stone-400 leading-relaxed">
-                  Statistik rekapitulasi jumlah warga dan siswa bersifat internal persaudaraan. Informasi statistik lengkap hanya dapat diakses oleh Warga & Pengurus resmi yang telah login.
+                  Statistik rekapitulasi jumlah warga dan siswa bersifat internal kekeluargaan. Informasi statistik lengkap hanya dapat diakses oleh Warga & Pengurus resmi yang telah login.
                 </p>
               </div>
             </div>
