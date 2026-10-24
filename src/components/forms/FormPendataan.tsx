@@ -936,6 +936,22 @@ export function FormPendataan({
                     </label>
                   )}
                 </div>
+
+                {/* Input Rayon / Tempat Latihan untuk Warga */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                    Rayon / Tempat Latihan (Asal atau Binaan Saat Ini)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Rayon SMPN 1 Mantup / Rayon Balai Desa / Lapangan"
+                    {...register("tempat_latihan")}
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm text-gray-900 transition"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    Titik tempat latihan silat Anda dahulu atau tempat Anda aktif membina saat ini.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -1001,11 +1017,11 @@ export function FormPendataan({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                      Tempat / Lokasi Latihan Subranting *
+                      Rayon / Tempat Latihan Siswa *
                     </label>
                     <input
                       type="text"
-                      placeholder="Contoh: SDN 1 Sukobendu / Halaman Balai Desa"
+                      placeholder="Contoh: Rayon SMPN 1 Mantup / Rayon Balai Desa Sukobendu"
                       {...register("tempat_latihan", {
                         onChange: () => clearFieldError("tempat_latihan"),
                       })}
@@ -1123,11 +1139,17 @@ export function FormPendataan({
                         {formValues.foto_kta_url ? "✓ Terlampir" : "(Belum Dilampirkan)"}
                       </strong>
                     </div>
+                    <div>
+                      <span className="text-stone-400 block">Rayon / Tempat Latihan:</span>
+                      <strong className="text-stone-800">
+                        {formValues.tempat_latihan || "-"}
+                      </strong>
+                    </div>
                   </>
                 ) : (
                   <>
                     <div>
-                      <span className="text-stone-400 block">Tempat Latihan:</span>
+                      <span className="text-stone-400 block">Rayon / Tempat Latihan:</span>
                       <strong className="text-indigo-900">
                         {formValues.tempat_latihan || "Subranting Desa"}
                       </strong>

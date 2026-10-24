@@ -275,6 +275,14 @@ function CekTiketContent() {
                       {result.anggota.desa?.nama_desa || "Kecamatan Mantup"}
                     </span>
                   </div>
+                  {result.anggota.tempat_latihan && (
+                    <div>
+                      <span className="text-stone-400 block">Rayon / Tempat Latihan:</span>
+                      <strong className="text-amber-900 font-bold">
+                        {result.anggota.tempat_latihan}
+                      </strong>
+                    </div>
+                  )}
                   <div>
                     <span className="text-stone-400 block">Tingkatan:</span>
                     <div className="mt-0.5">

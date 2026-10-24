@@ -2,12 +2,13 @@
 
 import React, { useState } from "react";
 import { AnggotaService } from "@/lib/services/anggotaService";
+import { RayonService } from "@/lib/services/rayonService";
 import { DESA_MANTUP_LIST } from "@/lib/constants/desas";
 import { VerifikasiBadge, KeaktifanBadge, TingkatanBadge, KategoriBadge } from "@/components/ui/Badge";
-import { Anggota, DuplikatCandidate, StatusVerifikasi } from "@/types/database";
+import { Anggota, DuplikatCandidate, StatusVerifikasi, Rayon } from "@/types/database";
 
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<"master" | "verifikasi" | "duplikat" | "desa">("master");
+  const [activeTab, setActiveTab] = useState<"master" | "verifikasi" | "duplikat" | "desa" | "rayon">("master");
   const [filterKategori, setFilterKategori] = useState<string>("");
   const [filterDesa, setFilterDesa] = useState<string>("");
   const [filterKeaktifan, setFilterKeaktifan] = useState<string>("");
@@ -20,14 +21,31 @@ export default function AdminDashboardPage() {
   const [catatanVerif, setCatatanVerif] = useState("");
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const [dataList, setDataList] = useState<Anggota[]>(() => AnggotaService.getAll());
+  const [rayonList, setRayonList] = useState<Rayon[]>(() => RayonService.getAll());
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Rayon & Validator Account Management States
+  const [showAddRayonModal, setShowAddRayonModal] = useState(false);
+  const [rayonSuccessMsg, setRayonSuccessMsg] = useState<string | null>(null);
+  const [isSavingRayon, setIsSavingRayon] = useState(false);
+  const [namaRayonInput, setNamaRayonInput] = useState("");
+  const [desaRayonInput, setDesaRayonInput] = useState(DESA_MANTUP_LIST[0].id);
+  const [namaKetuaInput, setNamaKetuaInput] = useState("");
+  const [waKetuaInput, setWaKetuaInput] = useState("");
+  const [alamatRayonInput, setAlamatRayonInput] = useState("");
+  const [emailRayonInput, setEmailRayonInput] = useState("");
+  const [passRayonInput, setPassRayonInput] = useState("IKSPI_Rayon2026!");
 
   const reloadData = async () => {
     setLoading(true);
     try {
-      const data = await AnggotaService.getAllAsync();
+      const [data, rayons] = await Promise.all([
+        AnggotaService.getAllAsync(),
+        RayonService.getAllAsync(),
+      ]);
       setDataList(data);
+      setRayonList(rayons);
     } finally {
       setLoading(false);
     }
@@ -52,7 +70,8 @@ export default function AdminDashboardPage() {
       const matchName = item.nama_lengkap.toLowerCase().includes(q);
       const matchKta = item.nomor_kta?.toLowerCase().includes(q);
       const matchDesa = item.desa?.nama_desa.toLowerCase().includes(q);
-      if (!matchName && !matchKta && !matchDesa) return false;
+      const matchRayon = item.tempat_latihan?.toLowerCase().includes(q);
+      if (!matchName && !matchKta && !matchDesa && !matchRayon) return false;
     }
     return true;
   });
@@ -289,6 +308,20 @@ export default function AdminDashboardPage() {
         >
           15 Subranting Desa
         </button>
+
+        <button
+          onClick={() => setActiveTab("rayon")}
+          className={`pb-3 text-sm font-bold border-b-2 transition flex items-center gap-1.5 shrink-0 ${
+            activeTab === "rayon"
+              ? "border-amber-700 text-amber-900"
+              : "border-transparent text-stone-500 hover:text-stone-800"
+          }`}
+        >
+          <span>Kelola Rayon & Validator</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900">
+            {rayonList.length}
+          </span>
+        </button>
       </div>
 
       {/* TAB 1: MASTER DATA ANGGOTA */}
@@ -411,6 +444,11 @@ export default function AdminDashboardPage() {
                           <span className="font-medium text-stone-800">
                             {a.desa?.nama_desa || "-"}
                           </span>
+                          {a.tempat_latihan && (
+                            <span className="text-[11px] text-amber-900 font-semibold block">
+                              Rayon: {a.tempat_latihan}
+                            </span>
+                          )}
                           <div className="text-[10px] text-stone-400">
                             {a.alamat_detail}
                           </div>
@@ -590,6 +628,14 @@ export default function AdminDashboardPage() {
                         {selectedVerifItem.desa?.nama_desa}
                       </span>
                     </div>
+                    {selectedVerifItem.tempat_latihan && (
+                      <div>
+                        <span className="text-stone-400 block">Rayon / Tempat Latihan:</span>
+                        <strong className="text-amber-900 font-bold">
+                          {selectedVerifItem.tempat_latihan}
+                        </strong>
+                      </div>
+                    )}
                     <div>
                       <span className="text-stone-400 block">Tempat, Tanggal Lahir:</span>
                       <span>{selectedVerifItem.tempat_lahir}, {selectedVerifItem.tanggal_lahir}</span>
@@ -810,6 +856,331 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {/* TAB 5: KELOLA RAYON & AKUN VALIDATOR */}
+      {activeTab === "rayon" && (
+        <div className="space-y-4">
+          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-amber-800 tracking-wider uppercase">
+                Struktur Latihan & Tim Validator Rayon
+              </span>
+              <h2 className="text-xl font-black text-stone-900 mt-0.5">
+                Kelola Rayon & Akun Validator
+              </h2>
+              <p className="text-xs text-stone-500 mt-1">
+                Daftarkan titik latihan (Rayon), tunjuk Ketua Rayon, dan buatkan akun login resmi sebagai Pembantu Validator berkas fisik KTA / siswa.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAddRayonModal(true)}
+              className="px-4 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold shadow-xs transition flex items-center gap-1.5 shrink-0"
+            >
+              <span>+</span>
+              <span>Daftarkan Rayon & Buat Akun</span>
+            </button>
+          </div>
+
+          {rayonSuccessMsg && (
+            <div className="p-4 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200 animate-fade-in flex items-center justify-between">
+              <span>{rayonSuccessMsg}</span>
+              <button onClick={() => setRayonSuccessMsg(null)} className="text-emerald-700 font-bold ml-2">✕</button>
+            </div>
+          )}
+
+          {/* List of Rayons */}
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-stone-700">
+                <thead className="bg-stone-50 border-b border-stone-200 text-stone-500 font-semibold uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th className="py-3 px-4">Nama Rayon & Lokasi</th>
+                    <th className="py-3 px-4">Sub Ranting (Desa)</th>
+                    <th className="py-3 px-4">Ketua Rayon / Kontak</th>
+                    <th className="py-3 px-4">Akun Login Validator</th>
+                    <th className="py-3 px-4">Status & Peran</th>
+                    <th className="py-3 px-4 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {rayonList.map((r) => (
+                    <tr key={r.id} className="hover:bg-amber-50/40 transition">
+                      <td className="py-3 px-4">
+                        <strong className="text-stone-900 font-bold block text-sm">
+                          {r.nama_rayon}
+                        </strong>
+                        <span className="text-[11px] text-stone-500 block">
+                          📍 {r.alamat_lokasi || "Lokasi latihan desa"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-semibold text-stone-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md inline-block">
+                          {r.desa?.nama_desa || "Semua Subranting"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <strong className="text-stone-900 block font-bold">
+                          {r.nama_ketua}
+                        </strong>
+                        {r.no_wa && (
+                          <a
+                            href={`https://wa.me/${r.no_wa.replace(/\D/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 hover:underline text-[11px] font-mono flex items-center gap-1 mt-0.5"
+                          >
+                            <span>💬</span>
+                            <span>{r.no_wa}</span>
+                          </a>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="space-y-0.5">
+                          <span className="font-mono text-stone-800 block text-[11px] select-all">
+                            📧 {r.email_akun}
+                          </span>
+                          <span className="font-mono text-amber-900 font-semibold block text-[11px]">
+                            🔑 {r.password_hash}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 inline-block">
+                          Validator Aktif
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const text = `Halo ${r.nama_ketua}, berikut akun validator SIKAP Mantup untuk Rayon ${r.nama_rayon}:\nLink Login: https://ikspimantup.my.id/auth/login\nEmail: ${r.email_akun}\nKata Sandi: ${r.password_hash}`;
+                              navigator.clipboard.writeText(text);
+                              alert("Kredensial berhasil disalin ke clipboard! Silakan kirimkan ke WhatsApp Ketua Rayon.");
+                            }}
+                            className="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-lg text-[11px] font-bold transition flex items-center gap-1"
+                            title="Salin kredensial untuk dikirim ke WA Ketua"
+                          >
+                            <span>📋</span>
+                            <span>Salin Akun</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (confirm(`Hapus Rayon ${r.nama_rayon}?`)) {
+                                await RayonService.delete(r.id);
+                                const updated = await RayonService.getAllAsync();
+                                setRayonList(updated);
+                              }
+                            }}
+                            className="px-2 py-1 text-red-600 hover:bg-red-50 rounded-lg text-xs"
+                            title="Hapus Rayon"
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {rayonList.length === 0 && (
+              <div className="p-8 text-center text-xs text-stone-500">
+                Belum ada Rayon yang didaftarkan. Klik tombol <strong>&quot;+ Daftarkan Rayon &amp; Buat Akun&quot;</strong> di atas untuk mendaftarkan titik latihan dan membuat akun validator bagi Ketua Rayon.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal Tambah Rayon & Buat Akun Ketua Rayon */}
+      {showAddRayonModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+              <div>
+                <h3 className="font-bold text-base text-stone-900">
+                  Daftarkan Rayon & Akun Validator
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Buatkan akun resmi agar Ketua Rayon dapat membantu memvalidasi siswa & warga di wilayahnya.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddRayonModal(false)}
+                className="text-stone-400 hover:text-stone-700 text-lg font-bold p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!namaRayonInput.trim() || !namaKetuaInput.trim() || !emailRayonInput.trim() || !passRayonInput.trim()) {
+                  alert("Semua kolom bertanda bintang wajib diisi!");
+                  return;
+                }
+                setIsSavingRayon(true);
+                try {
+                  const res = await RayonService.create({
+                    nama_rayon: namaRayonInput,
+                    desa_id: desaRayonInput,
+                    nama_ketua: namaKetuaInput,
+                    no_wa: waKetuaInput,
+                    alamat_lokasi: alamatRayonInput,
+                    email_akun: emailRayonInput,
+                    password_plain: passRayonInput,
+                  });
+                  if (res.success) {
+                    setRayonSuccessMsg(res.message);
+                    const updated = await RayonService.getAllAsync();
+                    setRayonList(updated);
+                    setShowAddRayonModal(false);
+                    setNamaRayonInput("");
+                    setNamaKetuaInput("");
+                    setWaKetuaInput("");
+                    setAlamatRayonInput("");
+                    setEmailRayonInput("");
+                  } else {
+                    alert(res.message);
+                  }
+                } finally {
+                  setIsSavingRayon(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 uppercase mb-1">
+                  Nama Rayon / Tempat Latihan *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={namaRayonInput}
+                  onChange={(e) => setNamaRayonInput(e.target.value)}
+                  placeholder="Contoh: Rayon SMPN 1 Mantup / Rayon Lapangan Desa"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-stone-300 text-stone-900 focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 uppercase mb-1">
+                    Wilayah Sub Ranting (Desa) *
+                  </label>
+                  <select
+                    value={desaRayonInput}
+                    onChange={(e) => setDesaRayonInput(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-stone-300 text-stone-900 bg-white"
+                  >
+                    {DESA_MANTUP_LIST.map((d) => (
+                      <option key={d.id} value={d.id}>{d.nama_desa}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 uppercase mb-1">
+                    Lokasi / Alamat Latihan
+                  </label>
+                  <input
+                    type="text"
+                    value={alamatRayonInput}
+                    onChange={(e) => setAlamatRayonInput(e.target.value)}
+                    placeholder="Contoh: Halaman SMPN 1 Mantup"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-stone-300 text-stone-900"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider block">
+                  Identitas Ketua Rayon & Kredensial Login Validator
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 uppercase mb-1">
+                      Nama Ketua Rayon *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={namaKetuaInput}
+                      onChange={(e) => setNamaKetuaInput(e.target.value)}
+                      placeholder="Contoh: Mas Joko Susilo"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 text-stone-900 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 uppercase mb-1">
+                      No. WhatsApp Ketua Rayon
+                    </label>
+                    <input
+                      type="text"
+                      value={waKetuaInput}
+                      onChange={(e) => setWaKetuaInput(e.target.value)}
+                      placeholder="Contoh: 081234567890"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 text-stone-900 bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 uppercase mb-1">
+                      Email Akun Login Validator *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={emailRayonInput}
+                      onChange={(e) => setEmailRayonInput(e.target.value)}
+                      placeholder="Contoh: rayon.smpn1@gmail.com"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 text-stone-900 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 uppercase mb-1">
+                      Kata Sandi Login *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={passRayonInput}
+                      onChange={(e) => setPassRayonInput(e.target.value)}
+                      placeholder="Kata Sandi"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 text-stone-900 bg-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                <button
+                  type="button"
+                  disabled={isSavingRayon}
+                  onClick={() => setShowAddRayonModal(false)}
+                  className="px-4 py-2 text-xs text-stone-600 hover:text-stone-900"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingRayon}
+                  className="px-5 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                >
+                  {isSavingRayon ? "Mendaftarkan..." : "Daftarkan & Buat Akun"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Modal Detail Anggota */}
       {selectedAnggota && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
@@ -888,6 +1259,10 @@ export default function AdminDashboardPage() {
                 <div>
                   <span className="text-stone-400 block">Subranting:</span>
                   <span>{selectedAnggota.desa?.nama_desa}</span>
+                </div>
+                <div>
+                  <span className="text-stone-400 block">Rayon / Tempat Latihan:</span>
+                  <span className="font-semibold text-stone-900">{selectedAnggota.tempat_latihan || "-"}</span>
                 </div>
               </div>
 

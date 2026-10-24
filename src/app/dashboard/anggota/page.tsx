@@ -17,6 +17,7 @@ export default function AnggotaDashboardPage() {
   const [alamatUpdate, setAlamatUpdate] = useState("");
   const [waUpdate, setWaUpdate] = useState("");
   const [fotoKtaUpdate, setFotoKtaUpdate] = useState("");
+  const [tempatLatihanUpdate, setTempatLatihanUpdate] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -40,6 +41,7 @@ export default function AnggotaDashboardPage() {
       setAlamatUpdate(anggota.alamat_detail || "");
       setWaUpdate(anggota.nomor_wa || "");
       setFotoKtaUpdate(anggota.foto_kta_url || "");
+      setTempatLatihanUpdate(anggota.tempat_latihan || "");
     }
   }, [anggota]);
 
@@ -127,6 +129,7 @@ export default function AnggotaDashboardPage() {
       await AnggotaService.updateAnggota(anggota.id, {
         alamat_detail: alamatUpdate.trim(),
         nomor_wa: waUpdate.trim(),
+        tempat_latihan: tempatLatihanUpdate.trim() || null,
         foto_kta_url: fotoKtaUpdate || anggota.foto_kta_url || null,
       });
 
@@ -250,6 +253,13 @@ export default function AnggotaDashboardPage() {
             </div>
 
             <div className="flex justify-between items-center py-1.5 border-b border-stone-100">
+              <span className="text-stone-400">Rayon / Tempat Latihan</span>
+              <span className="font-semibold text-stone-900">
+                {anggota.tempat_latihan || <span className="text-stone-400 font-normal">Belum Tercatat</span>}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-1.5 border-b border-stone-100">
               <span className="text-stone-400">Alamat Domisili</span>
               <span className="text-stone-800 text-right max-w-xs">
                 {anggota.alamat_detail} (RT/RW {anggota.rt_rw})
@@ -333,6 +343,19 @@ export default function AnggotaDashboardPage() {
                     type="text"
                     value={waUpdate}
                     onChange={(e) => setWaUpdate(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 text-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 uppercase mb-1">
+                    Rayon / Tempat Latihan (Asal / Binaan Saat Ini)
+                  </label>
+                  <input
+                    type="text"
+                    value={tempatLatihanUpdate}
+                    onChange={(e) => setTempatLatihanUpdate(e.target.value)}
+                    placeholder="Contoh: Rayon SMPN 1 Mantup / Rayon Balai Desa"
                     className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 text-stone-900"
                   />
                 </div>

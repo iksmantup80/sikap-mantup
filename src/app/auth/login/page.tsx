@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { RayonService } from "@/lib/services/rayonService";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
@@ -47,7 +48,28 @@ export default function LoginPage() {
       return;
     }
 
-    // 2. Verifikasi Akun Koordinator Subranting
+    // 2. Verifikasi Akun Validator / Ketua Rayon
+    try {
+      const rayonAuth = await RayonService.authenticate(cleanEmail, password);
+      if (rayonAuth.authenticated && rayonAuth.rayon) {
+        sessionStorage.setItem("sikap_user_role", "verifikator");
+        sessionStorage.setItem("sikap_user_email", cleanEmail);
+        sessionStorage.setItem("sikap_user_nama", rayonAuth.rayon.nama_ketua);
+        sessionStorage.setItem("sikap_user_rayon", rayonAuth.rayon.nama_rayon);
+        setTimeout(() => {
+          router.push("/dashboard/verifikator");
+        }, 350);
+        return;
+      } else if (rayonAuth.message) {
+        setLoading(false);
+        setErrorMessage(rayonAuth.message);
+        return;
+      }
+    } catch {
+      // lanjut ke pengecekan berikutnya jika offline/error
+    }
+
+    // 3. Verifikasi Akun Koordinator Subranting
     if (cleanEmail.includes("koord") || cleanEmail.includes("subranting")) {
       sessionStorage.setItem("sikap_user_role", "koordinator_subranting");
       sessionStorage.setItem("sikap_user_email", cleanEmail);
@@ -57,7 +79,7 @@ export default function LoginPage() {
       return;
     }
 
-    // 3. Verifikasi Akun Anggota Warga Mandiri
+    // 4. Verifikasi Akun Anggota Warga Mandiri
     sessionStorage.setItem("sikap_user_role", "anggota");
     sessionStorage.setItem("sikap_user_email", cleanEmail);
     setTimeout(() => {

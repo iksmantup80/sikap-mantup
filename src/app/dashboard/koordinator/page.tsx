@@ -157,7 +157,12 @@ export default function KoordinatorDashboardPage() {
                     </div>
                   </td>
                   <td className="py-3 px-4 text-stone-600">
-                    {a.alamat_detail} (RT/RW {a.rt_rw || "-"})
+                    <div>{a.alamat_detail} (RT/RW {a.rt_rw || "-"})</div>
+                    {a.tempat_latihan && (
+                      <span className="text-[10px] text-amber-900 font-semibold block mt-0.5">
+                        Rayon: {a.tempat_latihan}
+                      </span>
+                    )}
                   </td>
                   <td className="py-3 px-4">
                     <KeaktifanBadge status={a.status_keaktifan} />

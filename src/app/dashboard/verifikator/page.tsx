@@ -12,6 +12,15 @@ export default function VerifikatorDashboardPage() {
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [userNama, setUserNama] = useState<string>("");
+  const [userRayon, setUserRayon] = useState<string>("");
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUserNama(sessionStorage.getItem("sikap_user_nama") || "");
+      setUserRayon(sessionStorage.getItem("sikap_user_rayon") || "");
+    }
+  }, []);
 
   const reloadData = async () => {
     setLoading(true);
@@ -69,14 +78,17 @@ export default function VerifikatorDashboardPage() {
       {/* Header */}
       <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="text-xs font-bold text-amber-800 tracking-wider uppercase">
-            Panel Kerja Verifikasi & Admin Ranting
+          <span className="text-[11px] font-bold text-amber-800 tracking-wider uppercase bg-amber-100 px-2.5 py-0.5 rounded-full inline-block mb-1 border border-amber-200">
+            {userRayon ? `Tim Validator • ${userRayon}` : "Panel Kerja Verifikasi & Admin Ranting"}
           </span>
-          <h1 className="text-2xl font-black text-stone-900 mt-1">
-            Antrean Pemeriksaan Dokumen KTA Fisik
+          <h1 className="text-2xl font-black text-stone-900 mt-1 flex items-center gap-2 flex-wrap">
+            <span>Jien Shoo, {userNama || "Petugas Verifikator"}!</span>
+            <span className="text-xs font-bold text-amber-900 bg-amber-100/90 px-2.5 py-1 rounded-lg border border-amber-300">
+              ✋ Jien Sho
+            </span>
           </h1>
           <p className="text-xs text-stone-500 mt-1">
-            Periksa keaslian nomor KTA fisik resmi pusat, keabsahan tingkatan, dan kelengkapan identitas warga.
+            Pemeriksaan keaslian nomor KTA fisik resmi pusat, keabsahan jenjang sabuk siswa, dan kelayakan identitas warga.
           </p>
         </div>
 
@@ -229,6 +241,14 @@ export default function VerifikatorDashboardPage() {
                   <span className="text-stone-400 block">Alamat Domisili:</span>
                   <span>{selectedItem.alamat_detail} (RT/RW {selectedItem.rt_rw || "-"})</span>
                 </div>
+                {selectedItem.tempat_latihan && (
+                  <div>
+                    <span className="text-stone-400 block">Rayon / Tempat Latihan:</span>
+                    <strong className="text-amber-900 font-bold">
+                      {selectedItem.tempat_latihan}
+                    </strong>
+                  </div>
+                )}
               </div>
 
               {/* Photo Evidence Preview */}

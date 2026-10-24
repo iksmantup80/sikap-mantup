@@ -45,6 +45,21 @@ export interface WilayahDesa {
   updated_at: string;
 }
 
+export interface Rayon {
+  id: string;
+  nama_rayon: string;
+  desa_id?: string | null;
+  desa?: WilayahDesa | null;
+  nama_ketua: string;
+  no_wa?: string | null;
+  alamat_lokasi?: string | null;
+  email_akun: string;
+  password_hash: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Profile {
   id: string;
   email: string;

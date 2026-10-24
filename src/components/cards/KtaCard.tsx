@@ -152,6 +152,17 @@ export function KtaCard({
               {anggota.desa?.nama_desa || "Kecamatan Mantup"}
             </span>
           </div>
+
+          {anggota.tempat_latihan && (
+            <div>
+              <span className="text-stone-400 text-[10px] block uppercase font-medium">
+                Rayon / Tempat Latihan
+              </span>
+              <span className="text-amber-200 font-medium">
+                {anggota.tempat_latihan}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
