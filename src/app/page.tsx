@@ -170,6 +170,89 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SAMBUTAN KETUA RANTING MANTUP */}
+      <section className="py-16 bg-gradient-to-b from-stone-900 via-stone-950 to-stone-900 text-white border-y border-amber-900/40 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_right,_var(--tw-gradient-stops))] from-amber-900/20 via-transparent to-transparent pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="bg-stone-900/90 rounded-3xl border border-amber-500/30 p-6 sm:p-12 shadow-2xl backdrop-blur-md">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+              {/* Photo Column */}
+              <div className="lg:col-span-5 flex justify-center">
+                <div className="relative group">
+                  {/* Decorative Glow */}
+                  <div className="absolute -inset-2 bg-gradient-to-tr from-amber-500 to-red-600 rounded-3xl opacity-30 blur-xl group-hover:opacity-50 transition duration-500" />
+
+                  {/* Portrait Card */}
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-amber-500/50 shadow-2xl bg-stone-950 max-w-xs sm:max-w-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/ketua-ranting.jpg"
+                      alt="Ketua IKS.PI Kera Sakti Ranting Mantup"
+                      className="w-full h-auto object-cover object-top hover:scale-102 transition duration-500"
+                    />
+
+                    {/* Badge Overlay at Bottom */}
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-stone-950 via-stone-950/90 to-transparent p-4 text-center">
+                      <span className="inline-block text-[11px] font-bold text-amber-300 uppercase tracking-widest bg-amber-950/80 border border-amber-500/40 px-3 py-1 rounded-full mb-1">
+                        Pimpinan Perguruan
+                      </span>
+                      <h4 className="text-base font-black text-white tracking-wide">
+                        Ketua Ranting Mantup
+                      </h4>
+                      <p className="text-xs text-amber-200/80 font-medium">
+                        IKS.PI Kera Sakti • Ranting Mantup, Lamongan
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text & Message Column */}
+              <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+                <div>
+                  <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-500/10 border border-amber-400/30 px-3 py-1 rounded-full inline-block mb-3">
+                    Salam Persaudaraan ✋ Jien Sho
+                  </span>
+                  <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
+                    &quot;Jien Shoo, Selamat Datang Saudaraku Warga &amp; Siswa!&quot;
+                  </h2>
+                </div>
+
+                <div className="space-y-4 text-sm sm:text-base text-stone-300 leading-relaxed">
+                  <p>
+                    Sebagai keluarga besar <strong>IKS.PI Kera Sakti Ranting Mantup</strong>, mari bersama-sama kita wujudkan tertib administrasi perguruan melalui sistem digital <strong>SIKAP Mantup</strong>.
+                  </p>
+                  <p>
+                    Platform ini dihadirkan untuk mendata, memverifikasi keabsahan nomor KTA fisik resmi Padepokan Pusat Madiun, serta merangkul seluruh saudara seperguruan yang tersebar di <strong>15 Subranting Desa</strong> dan titik-titik latihan <strong>Rayon</strong> se-Kecamatan Mantup.
+                  </p>
+                  <p className="text-amber-200 font-medium italic border-l-2 border-amber-500/50 pl-3">
+                    &quot;Empat Penjuru Kita Cari Saudara, Tapi Bila Musuh Pantang Tunduk Kepala. Guyub rukun, bersatu, dan menjaga marwah perguruan.&quot;
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                  <Link
+                    href="/pendataan"
+                    className="px-6 py-3 bg-gradient-to-r from-red-600 via-amber-600 to-amber-700 hover:from-red-700 hover:to-amber-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-lg transition"
+                  >
+                    Ikuti Pendataan Warga Mandiri →
+                  </Link>
+                  <Link
+                    href="/#subranting"
+                    className="px-6 py-3 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-xs sm:text-sm font-semibold border border-stone-700 transition"
+                  >
+                    Lihat 15 Subranting Desa
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* WILAYAH 15 SUBRANTING DESA */}
       <section id="subranting" className="py-16 bg-stone-100/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
